@@ -4,9 +4,23 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
     @Override
     protected void setParent(Object parent, Object child) {
-        if (child instanceof ModuleManipulator) {
-            child.apply(parent)
+        switch (child.class) {
+            case ModuleManipulator:
+                child.apply(parent)
+                break
+
+            case Endpoint:
+                parent.endpoints << child
+                break;
+
+            case String:
+                if (parent instanceof Endpoint) {
+                    parent.grammar = child
+                }
         }
+//        if (child instanceof ModuleManipulator) {
+//            child.apply(parent)
+//        }
     }
 
     @Override
@@ -16,19 +30,24 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
     @Override
     protected Object createNode(Object name, Object body) {
-        Object result;
+        Object result
 
         switch (name) {
             case 'expose_to':
                 if (body.toString() == 'http') {
                     result = ModuleManipulator.does { it.isOnFrontEnd = true }
                 }
-                break;
+                break
+
+            case 'simple_uri':
+                result = body
+                break
+
             default:
                 result = instantiate(name)
         }
 
-        return result;
+        return result
     }
 
     @Override
@@ -48,8 +67,12 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
     private Object instantiate(String name) {
         switch (name.toString()) {
             case 'module':
-                return new Module();
-                break;
+                return new Module()
+                break
+
+            case 'map':
+                return new Endpoint()
+                break
         }
     }
 }

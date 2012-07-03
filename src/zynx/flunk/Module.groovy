@@ -14,6 +14,7 @@ class Module {
     String version
     String name
     boolean isOnFrontEnd = false
+    List<Endpoint> endpoints = [ ]
 
     public String buildModuleXml() {
         def writer = new StringWriter()
@@ -37,6 +38,19 @@ class Module {
                 if (this.isOnFrontEnd) {
                     fileset {
                         regex('res:/etc/system/SimpleDynamicImportHook.xml')
+                    }
+                }
+
+                this.endpoints.each {
+                    def that = it
+                    mapper {
+                        config {
+                            endpoint {
+                                grammar {
+                                    simple(that.grammar)
+                                }
+                            }
+                        }
                     }
                 }
             }

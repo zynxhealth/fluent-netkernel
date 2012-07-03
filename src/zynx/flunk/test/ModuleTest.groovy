@@ -44,3 +44,10 @@ class ModuleTest extends GroovyTestCase {
         assert xml.replace('\n', ' ') =~ /<fileset.*>.*<regex.*>.*res:\/etc\/system\/SimpleDynamicImportHook.xml/
     }
 }
+
+//module( uri: 'urn:simple:module', version: '1.0.0', name: 'simple module' ) {
+//    map {
+//        simple_uri 'res:/responseMessage/{inputMessage}'
+//        to_groovy ( script: 'script_name' )
+//    }
+//}
