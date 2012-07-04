@@ -10,4 +10,8 @@ package zynx.flunk
 class Endpoint {
     String grammar
     String groovyScript = ""
+
+    List<String> getArguments() {
+        grammar.findAll(~/\{(.*?)\}/, { outer, inner -> inner })
+    }
 }

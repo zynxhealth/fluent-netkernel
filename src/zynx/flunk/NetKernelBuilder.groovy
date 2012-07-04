@@ -5,36 +5,14 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
     @Override
     protected void setParent(Object parent, Object child) {
         switch (child.class) {
-            case ModuleManipulator:
+            case Manipulator:
                 child.apply(parent)
                 break
 
             case Endpoint:
                 parent.endpoints << child
                 break
-
-            default:
-                if (child instanceof java.util.Map) {
-                    switch (child["property"]){
-
-                        case 'simple_uri':
-                            parent.grammar = child["value"]
-                            break
-                        case 'to_groovy':
-                            parent.groovyScript = child["value"]
-                            break
-                    }
-                }
-
-                break
-//            case String:
-//                if (parent instanceof Endpoint) {
-//                    parent.grammar = child
-//                }
         }
-//        if (child instanceof ModuleManipulator) {
-//            child.apply(parent)
-//        }
     }
 
     @Override
@@ -49,16 +27,16 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
         switch (name) {
             case 'expose_to':
                 if (body.toString() == 'http') {
-                    result = ModuleManipulator.does { it.isOnFrontEnd = true }
+                    result = Manipulator.does { it.isOnFrontEnd = true }
                 }
                 break
 
            case 'simple_uri':
-                result = [property: name, value: body]
+               result = Manipulator.does { it.grammar = body }
                 break
 
             case 'to_groovy':
-                result = [property: name, value: body]
+                result = Manipulator.does { it.groovyScript = body }
                 break
 
             default:

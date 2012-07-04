@@ -52,7 +52,18 @@ class Module {
                                 if (!that.groovyScript.isEmpty()) {
                                     request {
                                         identifier('active:groovy')
+                                        argument(name: 'operator'){
+                                            script(that.groovyScript)
+                                        }
                                     }
+                                }
+                            }
+                        }
+
+                        if (!that.groovyScript.isEmpty()) {
+                            space {
+                                'import' {
+                                    'uri' ('urn:org:netkernel:lang:groovy')
                                 }
                             }
                         }

@@ -2,6 +2,7 @@ package zynx.flunk.test
 
 import zynx.flunk.NetKernelBuilder
 import zynx.flunk.Module
+import zynx.flunk.Endpoint
 
 class EndpointTest extends GroovyTestCase {
     private NetKernelBuilder builder;
@@ -44,7 +45,9 @@ class EndpointTest extends GroovyTestCase {
         }
 
         String xml = mut.buildModuleXml()
+
         assertFalse("Endpoints list empty", mut.endpoints.isEmpty())
+
         assertTrue("Endpoint doesn't contain simple grammar",
                 (xml.replace('\n', ' ') =~
                 /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<simple>/ +
@@ -55,5 +58,50 @@ class EndpointTest extends GroovyTestCase {
                 /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>active:groovy/).find()
         )
 
+        assertTrue("Endpoint request doesn't contain operator argument",
+                (xml.replace('\n', ' ') =~
+                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                        scriptPath).find())
+
+        assertTrue("Endpoint internal space doesn't contain groovy language import",
+                (xml.replace('\n', ' ') =~
+                        /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:groovy/).find())
     }
+
+    void testExtractArgumentsFromGrammarUri() {
+        Endpoint eut = new Endpoint()
+        eut.grammar = 'res:/{arg1}/{arg2}/something/{arg3}/moretext/{arg4}'
+        List<String> args = eut.getArguments()
+        assertEquals(4, args.size())
+        assertEquals('arg1', args[0].toString())
+        assertEquals('arg2', args[1].toString())
+        assertEquals('arg3', args[2].toString())
+        assertEquals('arg4', args[3].toString())
+    }
+
 }
+
+
+
+//
+//  module {
+//      resource {
+//          located_at ...
+//          implemented_via script
+//      }
+//  }
+//
+
+//module {
+//    expose {
+//        via_simple_uri
+//        script scriptPath
+//    }
+//}
+
+//module {
+//    map {
+//        simple_uri uri
+//        to_groovy scriptPath
+//    }
+//}
