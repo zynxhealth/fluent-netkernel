@@ -206,6 +206,22 @@ class EndpointTest extends GroovyTestCase {
                         /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:javascript/).find())
     }
 
+    void testHandleUnknownLanguageException() {
+        def uri = 'res:/responseMessage/{inputMessage}'
+        def scriptPath = 'res:/resources/scripts/myscript.dontknow'
+
+        Module mut = builder.module () {
+            map {
+                simple_uri uri
+                to_script scriptPath
+            }
+        }
+
+        shouldFail {
+            String xml = mut.buildModuleXml()
+        }
+    }
+
 // test for javascript/freemaker ... scripts
 
 
