@@ -15,6 +15,7 @@ class Module {
     String name
     boolean isOnFrontEnd = false
     List<Endpoint> endpoints = [ ]
+    List<Exposure> exposures = [ ]
 
     public String buildModuleXml() {
         def writer = new StringWriter()
@@ -41,6 +42,14 @@ class Module {
                     }
                 }
 
+                this.exposures.each {
+                    def exposure = it
+                    fileset {
+                        regex(exposure.filePath)
+                        rewrite(exposure.rewriteUri)
+                    }
+                }
+
                 this.endpoints.each {
                     def that = it
                     mapper {
@@ -49,26 +58,27 @@ class Module {
                                 grammar {
                                     simple(that.grammar)
                                 }
-                                if (!that.groovyScript.isEmpty()) {
+                                if (that.scriptPath) {
                                     request {
-                                        identifier('active:groovy')
+                                        identifier('active:' + that.getLanguage())
                                         argument(name: 'operator'){
-                                            script(that.groovyScript)
+                                            script(that.scriptPath)
                                         }
-                                        if (that.getArguments().size() > 0) {
-                                            that.getArguments().each {
-                                                argument(name: it, "[[arg:$it]]")
-                                            }
+                                        that.getArguments().each {
+                                            argument(name: it, "[[arg:$it]]")
                                         }
                                     }
                                 }
                             }
                         }
 
-                        if (!that.groovyScript.isEmpty()) {
-                            space {
+                        space {
+                            if (that.scriptPath) {
                                 'import' {
-                                    'uri' ('urn:org:netkernel:lang:groovy')
+                                    'uri' ('urn:org:netkernel:lang:' + that.getLanguage())
+                                }
+                                fileset {
+                                    regex (that.scriptPath)
                                 }
                             }
                         }

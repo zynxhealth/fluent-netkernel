@@ -12,6 +12,10 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
             case Endpoint:
                 parent.endpoints << child
                 break
+
+            case Exposure:
+                parent.exposures << child
+                break
         }
     }
 
@@ -35,8 +39,20 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                result = Manipulator.does { it.grammar = body }
                 break
 
+            case 'to_script':
+                result = Manipulator.does { it.scriptPath = body }
+                break
+
             case 'to_groovy':
                 result = Manipulator.does { it.groovyScript = body }
+                break
+
+            case 'file_path':
+                result = Manipulator.does { it.filePath = body }
+                break
+
+            case 'via_rewrite':
+                result = Manipulator.does {it.rewriteUri = body }
                 break
 
             default:
@@ -68,6 +84,10 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
             case 'map':
                 return new Endpoint()
+                break
+
+            case 'expose':
+                return new Exposure()
                 break
         }
     }

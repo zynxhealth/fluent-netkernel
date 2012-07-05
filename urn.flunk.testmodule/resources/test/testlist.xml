@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testlist>
+
+	<!--Add your tests here-->
+	<test>
+		<request>
+			<identifier>res:/THIS-WILL-FAIL-TO-RESOLVE-CHANGE-ME</identifier>
+		</request>
+		<assert>
+			<exception/>
+		</assert>
+	</test>
+		
+</testlist>

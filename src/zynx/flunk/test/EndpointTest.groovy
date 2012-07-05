@@ -3,6 +3,7 @@ package zynx.flunk.test
 import zynx.flunk.NetKernelBuilder
 import zynx.flunk.Module
 import zynx.flunk.Endpoint
+import java.util.regex.Pattern
 
 class EndpointTest extends GroovyTestCase {
     private NetKernelBuilder builder;
@@ -42,7 +43,7 @@ class EndpointTest extends GroovyTestCase {
         Module mut = builder.module () {
             map {
                 simple_uri uri
-                to_groovy scriptPath
+                to_script scriptPath
             }
         }
 
@@ -82,12 +83,12 @@ class EndpointTest extends GroovyTestCase {
 
     void testExecuteGroovyScriptWithParameters() {
         def uri = 'res:/{arg1}/{arg2}/something/{arg3}/moretext/{arg4}'
-        def scriptPath = 'res:/resources/scripts/myscript.groovy'
+        def scriptPath = 'res:/resources/scripts/myscript.gy'
 
         Module mut = builder.module () {
             map {
                 simple_uri uri
-                to_groovy scriptPath
+                to_script scriptPath
             }
         }
 
@@ -128,8 +129,109 @@ class EndpointTest extends GroovyTestCase {
                 (xml.replace('\n', ' ') =~
                 /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:groovy/).find())
 
+        assertTrue("Endpoint internal space doesn't contain reference to script path",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<space.*>.*<fileset.*>.*<regex>/ + scriptPath).find())
+
     }
+
+    void testFilesCanBeExposedAsResources() {
+        def expected_path = 'res:/extjs/contenteditor/.*/app/(.*)'
+
+        Module mut = builder.module() {
+            expose {
+                file_path expected_path
+            }
+        }
+
+        def xml = mut.buildModuleXml()
+
+        assertTrue("Rootspace doesn't contain expected fileset",
+                   (xml.replace('\n', ' ') =~
+                   /<rootspace.*>.*<fileset.*>.*<regex>/ + Pattern.quote(expected_path)).find())
+    }
+
+    void testFilesCanBeExposedWithRewrites() {
+        def expected_path = 'res:/extjs/contenteditor/.*/app/(.*)'
+        def expected_rewrite = 'res:/resources/extjs-app/app/$1'
+
+        Module mut = builder.module() {
+            expose {
+                file_path expected_path
+                via_rewrite expected_rewrite
+            }
+        }
+
+        def xml = mut.buildModuleXml()
+
+        assertTrue("Rootspace doesn't contain expected fileset",
+                (xml.replace('\n', ' ') =~
+                        /<rootspace.*>.*<fileset.*>.*<regex>/ + Pattern.quote(expected_path)).find())
+
+        assertTrue("Fileset doesn't contain rewrite",
+                (xml.replace('\n', ' ') =~
+                        /<rootspace.*>.*<fileset.*>.*<rewrite.*>/ + Pattern.quote(expected_rewrite)).find())
+    }
+
+    void testExecuteJavaScriptScript(){
+        def uri = 'res:/responseMessage/{inputMessage}'
+        def scriptPath = 'res:/resources/scripts/myscript.js'
+
+        Module mut = builder.module () {
+            map {
+                simple_uri uri
+                to_script scriptPath
+            }
+        }
+
+        String xml = mut.buildModuleXml()
+
+        assertFalse("Endpoints list empty", mut.endpoints.isEmpty())
+
+        assertTrue("Endpoint doesn't contain simple grammar",
+                (xml.replace('\n', ' ') =~ /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<simple>/ +
+                        uri.replace('{', '\\{').replace('}', '\\}')).find())
+
+        assertTrue("Endpoint doesn't contain active:javascript identifier",
+                (xml.replace('\n', ' ') =~
+                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>active:javascript/).find())
+
+        assertTrue("Endpoint request doesn't contain operator argument",
+                (xml.replace('\n', ' ') =~
+                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                        scriptPath).find())
+
+        assertTrue("Endpoint internal space doesn't contain javascript language import",
+                (xml.replace('\n', ' ') =~
+                        /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:javascript/).find())
+    }
+
+// test for javascript/freemaker ... scripts
+
+
+// test for multiple endpoints
+
+
+// test for dpml
+
+
+// test for generated documentation
+
+
+// test for XUnit tests
+
+
+// tests for active grammars
+
+
+// tests for semantic errors
+
+
+// (tests for "standard" grammars?)
+
+
 }
+
 
 //
 //  module {
@@ -148,6 +250,10 @@ class EndpointTest extends GroovyTestCase {
 //}
 
 //module {
+//    expose {
+//          filePath
+//          via_rewrite
+//    }
 //    map {
 //        simple_uri uri
 //        to_groovy scriptPath

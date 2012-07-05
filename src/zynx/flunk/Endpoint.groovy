@@ -10,8 +10,20 @@ package zynx.flunk
 class Endpoint {
     String grammar
     String groovyScript = ""
+    String scriptPath = ''
 
     List<String> getArguments() {
         grammar.findAll(~/\{(.*?)\}/, { outer, inner -> inner })
+    }
+
+    String getLanguage() {
+        switch (scriptPath) {
+            case ~/.*\.js/:
+                return 'javascript'
+            case ~/.*\.(groovy|gy)/:
+                return 'groovy'
+            default:
+                throw new Exception("Script path '$scriptPath' is either empty or it references unknown language")
+        }
     }
 }

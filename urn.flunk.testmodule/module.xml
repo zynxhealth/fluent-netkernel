@@ -1,0 +1,55 @@
+~<?xml version="1.0" encoding="UTF-8"?>
+<module version="2.0">
+   <meta>
+      <identity>
+         <uri>urn:flunk:testmodule</uri>
+         <version>1.0.0</version>
+      </identity>
+      <info>
+         <name>Zynx.flunk test</name>
+         <description>I am a test module for Zynx.flunk.  Ignore me.</description>
+         <icon>res:/flunk-test/pub/icon.png</icon>
+      </info>
+   </meta>
+   <system>
+      <dynamic/>
+   </system>
+   <rootspace name="Zynx.flunk test - Development Space" uri="urn:flunk:testmodule">
+      <fileset>
+         <regex>res:/etc/system/SimpleDynamicImportHook.xml</regex>
+      </fileset>
+      <fileset><!--Icon-->
+         <regex>res:/flunk-test/pub/(.*)</regex>
+         <rewrite>res:/resources/pub/$1</rewrite>
+      </fileset>
+   </rootspace>
+   <rootspace name="Zynx.flunk test - Documentation Space" public="true" uri="urn:flunk:testmodule:doc">
+      <fileset>
+         <regex>res:/etc/system/(Books|Docs).xml</regex>
+      </fileset>
+      <fileset>
+         <regex>res:/resources/doc/.*</regex>
+      </fileset>
+   </rootspace>
+   <rootspace name="Zynx.flunk test - Unit Test Space" public="true" uri="urn:flunk:testmodule:test">
+      <fileset>
+         <regex>res:/etc/system/Tests.xml</regex>
+      </fileset>
+      <fileset>
+         <regex>res:/resources/test/.*</regex>
+      </fileset>
+      <endpoint><!-- stop any configuration from module under test from polluting address space -->
+         <prototype>Limiter</prototype>
+         <grammar>res:/etc/
+            <regex type="anything"/>
+         </grammar>
+      </endpoint>
+      <import><!-- import the main space which we are testing -->
+         <uri>urn:flunk:testmodule</uri>
+      </import>
+      <import>
+         <uri>urn:org:netkernel:ext:layer1</uri>
+         <private/>
+      </import>
+   </rootspace>
+</module>
