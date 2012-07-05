@@ -49,6 +49,11 @@ class Module {
                                 grammar {
                                     simple(that.grammar)
                                 }
+                                if (!that.groovyScript.isEmpty()) {
+                                    request {
+                                        identifier('active:groovy')
+                                    }
+                                }
                             }
                         }
                     }

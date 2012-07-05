@@ -9,4 +9,5 @@ package zynx.flunk
  */
 class Endpoint {
     String grammar
+    String groovyScript = ""
 }

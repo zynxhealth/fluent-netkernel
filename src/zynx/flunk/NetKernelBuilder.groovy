@@ -11,12 +11,26 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
             case Endpoint:
                 parent.endpoints << child
-                break;
+                break
 
-            case String:
-                if (parent instanceof Endpoint) {
-                    parent.grammar = child
+            default:
+                if (child instanceof java.util.Map) {
+                    switch (child["property"]){
+
+                        case 'simple_uri':
+                            parent.grammar = child["value"]
+                            break
+                        case 'to_groovy':
+                            parent.groovyScript = child["value"]
+                            break
+                    }
                 }
+
+                break
+//            case String:
+//                if (parent instanceof Endpoint) {
+//                    parent.grammar = child
+//                }
         }
 //        if (child instanceof ModuleManipulator) {
 //            child.apply(parent)
@@ -39,8 +53,12 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 }
                 break
 
-            case 'simple_uri':
-                result = body
+           case 'simple_uri':
+                result = [property: name, value: body]
+                break
+
+            case 'to_groovy':
+                result = [property: name, value: body]
                 break
 
             default:
