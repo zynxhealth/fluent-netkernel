@@ -55,6 +55,11 @@ class Module {
                                         argument(name: 'operator'){
                                             script(that.groovyScript)
                                         }
+                                        if (that.getArguments().size() > 0) {
+                                            that.getArguments().each {
+                                                argument(name: it, "[[arg:$it]]")
+                                            }
+                                        }
                                     }
                                 }
                             }
