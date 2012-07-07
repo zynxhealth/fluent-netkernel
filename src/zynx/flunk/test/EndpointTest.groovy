@@ -134,43 +134,6 @@ class EndpointTest extends GroovyTestCase {
 
     }
 
-    void testFilesCanBeExposedAsResources() {
-        def expected_path = 'res:/extjs/contenteditor/.*/app/(.*)'
-
-        Module mut = builder.module() {
-            expose {
-                file_path expected_path
-            }
-        }
-
-        def xml = mut.buildModuleXml()
-
-        assertTrue("Rootspace doesn't contain expected fileset",
-                   (xml.replace('\n', ' ') =~
-                   /<rootspace.*>.*<fileset.*>.*<regex>/ + Pattern.quote(expected_path)).find())
-    }
-
-    void testFilesCanBeExposedWithRewrites() {
-        def expected_path = 'res:/extjs/contenteditor/.*/app/(.*)'
-        def expected_rewrite = 'res:/resources/extjs-app/app/$1'
-
-        Module mut = builder.module() {
-            expose {
-                file_path expected_path
-                via_rewrite expected_rewrite
-            }
-        }
-
-        def xml = mut.buildModuleXml()
-
-        assertTrue("Rootspace doesn't contain expected fileset",
-                (xml.replace('\n', ' ') =~
-                        /<rootspace.*>.*<fileset.*>.*<regex>/ + Pattern.quote(expected_path)).find())
-
-        assertTrue("Fileset doesn't contain rewrite",
-                (xml.replace('\n', ' ') =~
-                        /<rootspace.*>.*<fileset.*>.*<rewrite.*>/ + Pattern.quote(expected_rewrite)).find())
-    }
 
     void testExecuteJavaScriptScript(){
         def uri = 'res:/responseMessage/{inputMessage}'

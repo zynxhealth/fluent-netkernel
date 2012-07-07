@@ -13,6 +13,7 @@ class Module {
     String uri
     String version
     String name
+    String descrption
     boolean isOnFrontEnd = false
     List<Endpoint> endpoints = [ ]
     List<Exposure> exposures = [ ]
@@ -30,7 +31,7 @@ class Module {
                 }
                 info {
                     name this.name
-                    description this.name
+                    description this.descrption
                 }
             }
             system {
@@ -98,14 +99,17 @@ class Module {
         attrs.each { key, value ->
             switch (key) {
                 case 'name':
-                    name = value;
-                    break;
+                    name = value
+                    break
                 case 'uri':
-                    uri = value;
-                    break;
+                    uri = value
+                    break
                 case 'version':
-                    version = value;
-                    break;
+                    version = value
+                    break
+                case 'description':
+                    descrption = value
+                    break
             }
         }
     }
