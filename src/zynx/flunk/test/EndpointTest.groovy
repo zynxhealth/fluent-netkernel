@@ -80,7 +80,6 @@ class EndpointTest extends GroovyTestCase {
         assertEquals('arg4', args[3].toString())
     }
 
-
     void testExecuteGroovyScriptWithParameters() {
         def uri = 'res:/{arg1}/{arg2}/something/{arg3}/moretext/{arg4}'
         def scriptPath = 'res:/resources/scripts/myscript.gy'
@@ -220,6 +219,38 @@ class EndpointTest extends GroovyTestCase {
         shouldFail {
             String xml = mut.buildModuleXml()
         }
+    }
+
+    void testAddMultipleEndPoints() {
+        def expectedUri1 = 'res:/test1/{arg1}'
+        def expectedScriptPath1 = 'res:/resources/scripts/mygroovy.gy'
+        def expectedUri2 = 'res:/test2/{arg2}'
+        def expectedScriptPath2 = 'res:/resources/scripts/myjs.js'
+        def expectedUri3 = 'res:/test2/{arg3}'
+        def expectedScriptPath3 = 'res:/resources/scripts/mygroovy2.groovy'
+
+        Module mut = builder.module() {
+            map {
+                simple_uri expectedUri1
+                to_script expectedScriptPath1
+            }
+            map {
+                simple_uri expectedUri2
+                to_script expectedScriptPath2
+            }
+            map {
+                simple_uri expectedUri3
+                to_script expectedScriptPath3
+            }
+        }
+
+        String xml = mut.buildModuleXml()
+
+        assertEquals("Did not find 3 endpoints", 3, (xml.replace('\n', ' ') =~ /<endpoint>/).size())
+        assertEquals("Did not find 1 inner space", 1, (xml.replace('\n', ' ') =~ /<space>/).size())
+        assertTrue("No endpoints contain simple grammar 1",
+                (xml.replace('\n', ' ') =~ /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<simple>/ +
+                        expectedUri1.replace('{', '\\{').replace('}', '\\}')).find())
     }
 
 // test for javascript/freemaker ... scripts

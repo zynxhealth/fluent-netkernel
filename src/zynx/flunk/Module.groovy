@@ -20,6 +20,7 @@ class Module {
     public String buildModuleXml() {
         def writer = new StringWriter()
         def xml = new MarkupBuilder(writer)
+        def thisEndpoint
 
         xml.module(version : '2.0') {
             meta {
@@ -50,35 +51,38 @@ class Module {
                     }
                 }
 
-                this.endpoints.each {
-                    def that = it
-                    mapper {
-                        config {
+                mapper {
+                    config {
+                        this.endpoints.each {
+                            thisEndpoint = it
                             endpoint {
                                 grammar {
-                                    simple(that.grammar)
+                                    simple(thisEndpoint.grammar)
                                 }
-                                if (that.scriptPath) {
+                                if (thisEndpoint.scriptPath) {
                                     request {
-                                        identifier('active:' + that.getLanguage())
+                                        identifier('active:' + thisEndpoint.getLanguage())
                                         argument(name: 'operator'){
-                                            script(that.scriptPath)
+                                            script(thisEndpoint.scriptPath)
                                         }
-                                        that.getArguments().each {
+                                        thisEndpoint.getArguments().each {
                                             argument(name: it, "[[arg:$it]]")
                                         }
                                     }
                                 }
                             }
                         }
+                    }
 
-                        space {
-                            if (that.scriptPath) {
+                    space {
+                        this.endpoints.each {
+                            thisEndpoint = it
+                            if (thisEndpoint.scriptPath) {
                                 'import' {
-                                    'uri' ('urn:org:netkernel:lang:' + that.getLanguage())
+                                    'uri' ('urn:org:netkernel:lang:' + thisEndpoint.getLanguage())
                                 }
                                 fileset {
-                                    regex (that.scriptPath)
+                                    regex (thisEndpoint.scriptPath)
                                 }
                             }
                         }
