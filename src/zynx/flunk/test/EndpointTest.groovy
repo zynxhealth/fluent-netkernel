@@ -1,9 +1,9 @@
 package zynx.flunk.test
 
-import zynx.flunk.NetKernelBuilder
-import zynx.flunk.Module
 import zynx.flunk.Endpoint
-import java.util.regex.Pattern
+import zynx.flunk.Module
+import zynx.flunk.NetKernelBuilder
+import zynx.flunk.Argument
 
 class EndpointTest extends GroovyTestCase {
     private NetKernelBuilder builder;
@@ -72,12 +72,14 @@ class EndpointTest extends GroovyTestCase {
     void testExtractArgumentsFromGrammarUri() {
         Endpoint eut = new Endpoint()
         eut.grammar = 'res:/{arg1}/{arg2}/something/{arg3}/moretext/{arg4}'
-        List<String> args = eut.getArguments()
-        assertEquals(4, args.size())
-        assertEquals('arg1', args[0].toString())
-        assertEquals('arg2', args[1].toString())
-        assertEquals('arg3', args[2].toString())
-        assertEquals('arg4', args[3].toString())
+        List<Argument> args = eut.getArguments()
+
+        assertEquals("Didn't create 4 arguments", 4, args.size())
+        assertTrue("Expected argument 1 not found", args.find {it.name == 'arg1' } != null)
+        assertTrue("Expected argument 2 not found", args.find {it.name == 'arg2' } != null)
+        assertTrue("Expected argument 3 not found", args.find {it.name == 'arg3' } != null)
+        assertTrue("Expected argument 4 not found", args.find {it.name == 'arg4' } != null)
+        assertTrue("Unexpected argument 5 found", args.find {it.name == 'arg5' } == null)
     }
 
     void testExecuteGroovyScriptWithParameters() {
@@ -135,6 +137,7 @@ class EndpointTest extends GroovyTestCase {
     }
 
 
+
     void testExecuteJavaScriptScript(){
         def uri = 'res:/responseMessage/{inputMessage}'
         def scriptPath = 'res:/resources/scripts/myscript.js'
@@ -152,20 +155,54 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint doesn't contain simple grammar",
                 (xml.replace('\n', ' ') =~ /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<simple>/ +
-                        uri.replace('{', '\\{').replace('}', '\\}')).find())
+                uri.replace('{', '\\{').replace('}', '\\}')).find())
 
         assertTrue("Endpoint doesn't contain active:javascript identifier",
                 (xml.replace('\n', ' ') =~
-                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>active:javascript/).find())
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>active:javascript/).find())
 
         assertTrue("Endpoint request doesn't contain operator argument",
                 (xml.replace('\n', ' ') =~
-                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
-                        scriptPath).find())
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                scriptPath).find())
 
         assertTrue("Endpoint internal space doesn't contain javascript language import",
                 (xml.replace('\n', ' ') =~
-                        /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:javascript/).find())
+                /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:javascript/).find())
+    }
+
+    void testExecuteFreemarkerScript() {
+        def uri = 'res:/responseMessage/{inputMessage}'
+        def scriptPath = 'res:/resources/scripts/myscript.ftl'
+
+        Module mut = builder.module () {
+            map {
+                simple_uri uri
+                to_script scriptPath
+            }
+        }
+
+        String xml = mut.buildModuleXml()
+
+        assertFalse("Endpoints list empty", mut.endpoints.isEmpty())
+
+        assertTrue("Endpoint doesn't contain simple grammar",
+                (xml.replace('\n', ' ') =~ /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<simple>/ +
+                uri.replace('{', '\\{').replace('}', '\\}')).find())
+
+        assertTrue("Endpoint doesn't contain active:freemarker identifier",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>active:freemarker/).find())
+
+        assertTrue("Endpoint request doesn't contain operator argument",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                scriptPath).find())
+
+        assertTrue("Endpoint internal space doesn't contain freemarker language import",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:freemarker/).find())
+
     }
 
     void testHandleUnknownLanguageException() {
@@ -213,16 +250,13 @@ class EndpointTest extends GroovyTestCase {
         assertEquals("Did not find 1 inner space", 1, (xml.replace('\n', ' ') =~ /<space>/).size())
         assertTrue("No endpoints contain simple grammar 1",
                 (xml.replace('\n', ' ') =~ /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<simple>/ +
-                        expectedUri1.replace('{', '\\{').replace('}', '\\}')).find())
+                expectedUri1.replace('{', '\\{').replace('}', '\\}')).find())
     }
 
-// test for javascript/freemaker ... scripts
-
-
-// test for multiple endpoints
 
 
 // test for dpml
+
 
 
 // test for generated documentation

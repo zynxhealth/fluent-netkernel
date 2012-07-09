@@ -16,6 +16,10 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
             case Exposure:
                 parent.exposures << child
                 break
+
+            case Argument:
+                parent.arguments[child] = new Argument()
+                break
         }
     }
 
@@ -55,6 +59,10 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 result = Manipulator.does {it.rewriteUri = body }
                 break
 
+            case 'with_argument':
+                result = Manipulator.does {it.parameters << body }
+                break
+
             default:
                 result = instantiate(name)
         }
@@ -88,6 +96,10 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
             case 'expose':
                 return new Exposure()
+                break
+
+            case 'with_argument':
+                return new Argument()
                 break
         }
     }

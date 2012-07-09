@@ -2,13 +2,6 @@ package zynx.flunk
 
 import groovy.xml.MarkupBuilder
 
-/**
- * Created with IntelliJ IDEA.
- * User: WinslowRi01
- * Date: 6/29/12
- * Time: 10:20 PM
- * To change this template use File | Settings | File Templates.
- */
 class Module {
     String uri
     String version
@@ -67,7 +60,7 @@ class Module {
                                             script(thisEndpoint.scriptPath)
                                         }
                                         thisEndpoint.getArguments().each {
-                                            argument(name: it, "[[arg:$it]]")
+                                            argument(name: it.name, "[[arg:$it.name]]")
                                         }
                                     }
                                 }
