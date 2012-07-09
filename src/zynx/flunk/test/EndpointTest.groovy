@@ -82,7 +82,7 @@ class EndpointTest extends GroovyTestCase {
         assertTrue("Unexpected argument 5 found", args.find {it.name == 'arg5' } == null)
     }
 
-    void testExecuteGroovyScriptWithParameters() {
+    void testExecuteGroovyScriptWithArguments() {
         def uri = 'res:/{arg1}/{arg2}/something/{arg3}/moretext/{arg4}'
         def scriptPath = 'res:/resources/scripts/myscript.gy'
 
@@ -136,7 +136,7 @@ class EndpointTest extends GroovyTestCase {
 
     }
 
-    void testSpecifyParametersByValue() {
+    void testSpecifyArgumentsByValue() {
         def arg1 = 'argument1'
         def arg2 = 'argument2'
         def uri = "res:/responseMessage/{$arg1}"
