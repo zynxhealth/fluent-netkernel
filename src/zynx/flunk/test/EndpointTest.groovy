@@ -136,7 +136,40 @@ class EndpointTest extends GroovyTestCase {
 
     }
 
+    void testSpecifyParametersByValue() {
+        def arg1 = 'argument1'
+        def arg2 = 'argument2'
+        def uri = "res:/responseMessage/{$arg1}"
+        def scriptPath = 'res:/resources/scripts/myscript.ftl'
 
+        Module mut = builder.module () {
+            map {
+                simple_uri uri
+                to_script scriptPath
+                with_argument (name: arg1, pass_by: 'value')
+                with_argument (name: arg2)
+            }
+        }
+
+        String xml = mut.buildModuleXml()
+
+        assertEquals("Should create 1 endpoint", 1, mut.endpoints.size())
+        assertEquals("Should create 2 arguments", 2, mut.endpoints[0].arguments.size())
+
+        assertTrue("Endpoint request doesn't contain operator argument",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                scriptPath).find())
+
+        assertTrue("Argument {$arg1} doesn't contain method=as-string modifier" ,
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='/+ arg1 + /' method='as-string'>/).find())
+
+        assertTrue("Argument {$arg2} has a method=as-string modifier" ,
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='/+ arg2 + /'>/).find())
+
+    }
 
     void testExecuteJavaScriptScript(){
         def uri = 'res:/responseMessage/{inputMessage}'

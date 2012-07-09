@@ -10,7 +10,7 @@ class Argument {
                 case 'name':
                     name = value
                     break
-                case 'passBy':
+                case 'pass_by':
                     passBy = value
                     break
             }

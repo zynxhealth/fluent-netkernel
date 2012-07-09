@@ -18,7 +18,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 break
 
             case Argument:
-                parent.arguments[child] = new Argument()
+                parent.addArgument(child)
                 break
         }
     }

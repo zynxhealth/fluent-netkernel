@@ -60,7 +60,14 @@ class Module {
                                             script(thisEndpoint.scriptPath)
                                         }
                                         thisEndpoint.getArguments().each {
-                                            argument(name: it.name, "[[arg:$it.name]]")
+                                            switch (it.passBy) {
+                                                case 'value':
+                                                    argument(name: it.name, method: "as-string", "[[arg:$it.name]]")
+                                                    break
+                                                default:
+                                                    argument(name: it.name, "[[arg:$it.name]]")
+                                                    break
+                                            }
                                         }
                                     }
                                 }

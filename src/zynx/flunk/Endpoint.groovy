@@ -5,16 +5,19 @@ class Endpoint {
     String groovyScript = ""
     String scriptPath = ''
 
-    List<Argument> args = []
+    List<Argument> arguments = []
 
     List<Argument> getArguments() {
-        String result
-        Argument arg
-
-        for (it in grammar.findAll(~/\{(.*?)\}/, {outer, inner -> inner })) {
-            args << new Argument(name: it)
+        grammar.findAll(~/\{(.*?)\}/, {outerGroup, innerGroup -> innerGroup }).each {argumentName ->
+            addArgument(new Argument(name: argumentName))
         }
-        return args
+        return arguments
+    }
+
+    void addArgument(Argument arg) {
+        if (!arguments.find {it.name == arg.name}) {
+            arguments << arg
+        }
     }
 
     String getLanguage() {
