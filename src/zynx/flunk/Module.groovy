@@ -51,19 +51,21 @@ class Module {
                             thisEndpoint = it
                             endpoint {
                                 grammar {
-                                    if (thisEndpoint.grammar) {
-                                        simple(thisEndpoint.grammar)
+                                    if (thisEndpoint.simpleGrammar) {
+                                        simple(thisEndpoint.simpleGrammar)
                                     }
-                                    if (thisEndpoint.resource) {
-                                        active {
-                                            identifier('active:' + thisEndpoint.resource.identifier)
+                                    else {
+                                        if (thisEndpoint.resource) {
+                                            active {
+                                                identifier('active:' + thisEndpoint.resource.identifier)
 
-                                            thisEndpoint.resource.getArguments().each {
-                                                argument(name: it.name, min: it.min, max: it.max)
-                                            }
+                                                thisEndpoint.resource.getArguments().each {
+                                                    argument(name: it.name, min: it.min, max: it.max)
+                                                }
 
-                                            if (thisEndpoint.resource.varArgs) {
-                                                varargs()
+                                                if (thisEndpoint.resource.varArgs) {
+                                                    varargs()
+                                                }
                                             }
                                         }
                                     }

@@ -1,7 +1,20 @@
 package zynx.flunk
 
 class Endpoint {
-    String grammar
+
+    String getSimpleGrammar() {
+        if (!simpleGrammar && resource && resource.identifier.startsWith('res:/'))  {
+            simpleGrammar = resource.identifier
+        }
+
+        return simpleGrammar
+    }
+
+    void setSimpleGrammar(String simpleGrammar) {
+        this.simpleGrammar = simpleGrammar
+    }
+
+    String simpleGrammar
     String groovyScript = ""
     String scriptPath = ''
 
@@ -9,12 +22,12 @@ class Endpoint {
     List<Argument> arguments = []
 
     List<Argument> getArguments() {
-        if (grammar) {
-            grammar.findAll(~/\{(.*?)\}/, {outerGroup, innerGroup -> innerGroup }).each {argumentName ->
+        if (simpleGrammar) {
+            simpleGrammar.findAll(~/\{(.*?)\}/, {outerGroup, innerGroup -> innerGroup }).each {argumentName ->
                 addArgument(new Argument(name: argumentName))
             }
         }
-        if (resource) {
+        else if (resource) {
             arguments = resource.getArguments()
         }
 

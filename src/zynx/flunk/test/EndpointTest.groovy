@@ -122,6 +122,45 @@ class EndpointTest extends GroovyTestCase {
 
     }
 
+    void testUseResourceKeywordToSpecifySimpleGrammar()  {
+        def arg1 = 'arg1'
+        def myResource = "res:/myResource/{$arg1}"
+        def scriptPath = 'res:/resources/scripts/myscript.groovy'
+
+        Module mut = builder.module(name:'name') {
+            map {
+                resource (myResource)
+                to_script scriptPath
+            }
+        }
+        String xml = mut.buildModuleXml()
+        println xml
+
+        assertFalse("Endpoints list empty", mut.endpoints.isEmpty())
+        assertTrue("Endpoint doesn't contain simple grammar",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<simple>/ +
+                myResource.replace('{', '\\{').replace('}', '\\}')).find())
+
+        assertTrue("Endpoint doesn't contain active:groovy identifier",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>active:groovy/).find())
+
+        assertTrue("Endpoint request doesn't contain operator argument",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                scriptPath).find())
+
+        assertTrue("Endpoint internal space doesn't contain groovy language import",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:groovy/).find())
+
+        assertTrue("Endpoint request doesn't contain argument arg1",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request.*>.*<argument name='arg1'>\[\[arg:arg1\]\]/).find())
+
+    }
+
     void testExecuteGroovyScript(){
         def uri = 'res:/responseMessage/{inputMessage}'
         def scriptPath = 'res:/resources/scripts/myscript.groovy'
@@ -157,7 +196,7 @@ class EndpointTest extends GroovyTestCase {
 
     void testExtractArgumentsFromGrammarUri() {
         Endpoint eut = new Endpoint()
-        eut.grammar = 'res:/{arg1}/{arg2}/something/{arg3}/moretext/{arg4}'
+        eut.simpleGrammar = 'res:/{arg1}/{arg2}/something/{arg3}/moretext/{arg4}'
         List<Argument> args = eut.getArguments()
 
         assertEquals("Didn't create 4 arguments", 4, args.size())

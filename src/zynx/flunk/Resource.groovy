@@ -7,9 +7,6 @@ class Resource {
     List<Argument> arguments = []
 
     List<Argument> getArguments() {
-//        grammar.findAll(~/\{(.*?)\}/, {outerGroup, innerGroup -> innerGroup }).each {argumentName ->
-//            addArgument(new Argument(name: argumentName))
-//        }
         return arguments
     }
 

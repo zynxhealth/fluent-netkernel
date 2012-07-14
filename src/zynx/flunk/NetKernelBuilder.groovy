@@ -44,7 +44,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 break
 
            case 'simple_uri':
-               result = Manipulator.does { it.grammar = body }
+               result = Manipulator.does { it.simpleGrammar = body }
                 break
 
             case 'to_script':
