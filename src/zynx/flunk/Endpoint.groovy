@@ -9,9 +9,15 @@ class Endpoint {
     List<Argument> arguments = []
 
     List<Argument> getArguments() {
-        grammar.findAll(~/\{(.*?)\}/, {outerGroup, innerGroup -> innerGroup }).each {argumentName ->
-            addArgument(new Argument(name: argumentName))
+        if (grammar) {
+            grammar.findAll(~/\{(.*?)\}/, {outerGroup, innerGroup -> innerGroup }).each {argumentName ->
+                addArgument(new Argument(name: argumentName))
+            }
         }
+        if (resource) {
+            arguments = resource.getArguments()
+        }
+
         return arguments
     }
 

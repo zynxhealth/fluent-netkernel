@@ -83,6 +83,45 @@ class EndpointTest extends GroovyTestCase {
 
     }
 
+    void testAssociateActiveGrammarToGroovyScript() {
+        def myResource = 'myResource'
+        def arg1 = 'arg1'
+        def scriptPath = 'res:/resources/scripts/myscript.groovy'
+
+        Module mut = builder.module (name:'name') {
+            map {
+                resource (myResource) {
+                    with_argument (name: arg1)
+                }
+                to_script scriptPath
+            }
+        }
+
+        String xml = mut.buildModuleXml()
+
+        assertFalse("Endpoints list empty", mut.endpoints.isEmpty())
+        assertTrue("Endpoint doesn't contain identifer for active grammar",
+                (xml.replace('\n', ' ') =~
+                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<identifier>active:/ + myResource).find())
+        assertTrue("Grammar doesn't contain the argument {$arg1}" ,
+                (xml.replace('\n', ' ') =~
+                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<argument name='/+ arg1 + /'/).find())
+
+        assertTrue("Endpoint doesn't contain active:groovy identifier",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>active:groovy/).find())
+
+        assertTrue("Endpoint request doesn't contain operator argument",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                scriptPath).find())
+
+        assertTrue("Endpoint internal space doesn't contain groovy language import",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:groovy/).find())
+
+    }
+
     void testExecuteGroovyScript(){
         def uri = 'res:/responseMessage/{inputMessage}'
         def scriptPath = 'res:/resources/scripts/myscript.groovy'
