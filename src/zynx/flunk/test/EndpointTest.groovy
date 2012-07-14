@@ -36,6 +36,53 @@ class EndpointTest extends GroovyTestCase {
                 uri.replace('{', '\\{').replace('}', '\\}')).find())
     }
 
+    void testSpecifyActiveGrammar(){
+        def myResource = 'myResource'
+        def arg1 = 'arg1'
+        def arg2 = 'arg2'
+
+        Module mut = builder.module(name:'name') {
+            map {
+                resource(myResource) {
+                    with_argument (name: arg1, min: 2, max: 3)
+                    with_argument (name: arg2)
+                    with_variable_arguments true
+                }
+            }
+        }
+
+        String xml = mut.buildModuleXml()
+
+        assertFalse("Endpoints list empty", mut.endpoints.isEmpty())
+        assertTrue("Endpoint doesn't contain identifer for active grammar",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<identifier>active:/ + myResource).find())
+        assertTrue("Grammar doesn't contain the argument {$arg1}" ,
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<argument name='/+ arg1 + /'/).find())
+        assertTrue("Argument {$arg1} has invalid min attribute" ,
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<argument name='/+ arg1 + /'.*min='2'/).find())
+        assertTrue("Argument {$arg1} has invalid max attribute" ,
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<argument name='/+ arg1 + /'.*max='3'/).find())
+
+        assertTrue("Grammar doesn't contain the argument {$arg2}" ,
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<argument name='/+ arg2 + /'/).find())
+        assertTrue("Argument {$arg2} has invalid default for max attribute" ,
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<argument name='/+ arg2 + /'.*max='1'/).find())
+        assertTrue("Argument {$arg2} has invalid default for min attribute" ,
+                (xml.replace('\n', ' ') =~
+                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<argument name='/+ arg2 + /'.*max='1'/).find())
+
+        assertTrue("Grammar doesn't contain variable arguments" ,
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<varargs/).find())
+
+    }
+
     void testExecuteGroovyScript(){
         def uri = 'res:/responseMessage/{inputMessage}'
         def scriptPath = 'res:/resources/scripts/myscript.groovy'
@@ -285,6 +332,7 @@ class EndpointTest extends GroovyTestCase {
                 (xml.replace('\n', ' ') =~ /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<simple>/ +
                 expectedUri1.replace('{', '\\{').replace('}', '\\}')).find())
     }
+
 
 
 

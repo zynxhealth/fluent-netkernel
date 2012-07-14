@@ -20,6 +20,10 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
             case Argument:
                 parent.addArgument(child)
                 break
+
+            case Resource:
+                parent.resource = child
+                break
         }
     }
 
@@ -59,8 +63,18 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 result = Manipulator.does {it.rewriteUri = body }
                 break
 
+            case 'resource':
+                result = instantiate(name)
+                result.identifier = body
+                break
+
+            case 'with_variable_arguments':
+                result = Manipulator.does {it.varArgs = true }
+                break
+
             default:
                 result = instantiate(name)
+                break
         }
 
         return result
@@ -97,6 +111,11 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
             case 'with_argument':
                 return new Argument()
                 break
+
+            case 'resource':
+                return new Resource()
+                break
+
         }
     }
 }

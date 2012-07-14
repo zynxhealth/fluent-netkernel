@@ -5,6 +5,7 @@ class Endpoint {
     String groovyScript = ""
     String scriptPath = ''
 
+    Resource resource
     List<Argument> arguments = []
 
     List<Argument> getArguments() {
