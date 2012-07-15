@@ -44,18 +44,4 @@ class Resource {
         }
     }
 
-//    public void setAttributes(Map attrs) {
-//        attrs.each { key, value ->
-//            switch (key) {
-//                case 'identifier':
-//                    identifier = value
-//                    break
-//
-//                default:
-//                    identifier = value
-//                    break
-//        }
-
-//    }
-//}
 }

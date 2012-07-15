@@ -71,7 +71,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 }
                 break
 
-            case 'to_script':
+            case 'use_script':
                 result = Manipulator.does {
                     if (!it.resource) {
                         it.resource = new Resource()

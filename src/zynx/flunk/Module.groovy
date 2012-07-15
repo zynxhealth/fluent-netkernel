@@ -6,7 +6,7 @@ class Module {
     String uri
     String version
     String name
-    String descrption
+    String description
     boolean isOnFrontEnd = false
     List<Exposure> exposures = [ ]
 
@@ -47,7 +47,7 @@ class Module {
             }
             info {
                 name this.name
-                description this.descrption
+                description this.description
             }
         }
         xml.system {
@@ -57,6 +57,7 @@ class Module {
 
     def buildSimpleExposures(xml) {
         Exposure thisExposure
+
         this.exposures.findAll { it.filePath }.each {
             thisExposure = it
             xml.fileset {
@@ -96,9 +97,7 @@ class Module {
                 if (thisResource.scriptPath) {
                     request {
                         identifier('active:' + thisResource.getLanguage())
-                        argument(name: 'operator'){
-                            script(thisResource.scriptPath)
-                        }
+                        argument(name: 'operator', thisResource.scriptPath)
                         thisResource.getArguments().each {
                             switch (it.passBy) {
                                 case 'value':
@@ -116,7 +115,6 @@ class Module {
     }
 
     def buildInnerSpace(xml) {
-
         Resource thisResource
 
         xml.space {
@@ -147,7 +145,7 @@ class Module {
                     version = value
                     break
                 case 'description':
-                    descrption = value
+                    description = value
                     break
             }
         }

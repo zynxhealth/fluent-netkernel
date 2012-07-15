@@ -12,17 +12,6 @@ class EndpointTest extends GroovyTestCase {
         builder = new NetKernelBuilder()
     }
 
-//    @Ignore
-//    void testEndpointCanExist() {
-//        def mut = builder.module() {
-//            expose {}
-//        }
-//        String xml = mut.buildModuleXml()
-//
-//        assertTrue("Endpoint doesn't exist",
-//                (xml.replace('\n', ' ') =~ /<mapper.*>.*<config.*>.*<endpoint.*>/).find())
-//    }
-
     void testSpecifySimpleGrammar() {
         def uri = 'res:/responseMessage/{inputMessage}'
         Module mut = builder.module() {
@@ -93,11 +82,12 @@ class EndpointTest extends GroovyTestCase {
                 resource (myResource) {
                     with_argument (name: arg1)
                 }
-                to_script scriptPath
+                use_script scriptPath
             }
         }
 
         String xml = mut.buildModuleXml()
+        println xml
 
         assertTrue("Endpoint doesn't contain identifer for active grammar",
                 (xml.replace('\n', ' ') =~
@@ -112,7 +102,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint request doesn't contain operator argument",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*/ +
                 scriptPath).find())
 
         assertTrue("Endpoint internal space doesn't contain groovy language import",
@@ -129,7 +119,7 @@ class EndpointTest extends GroovyTestCase {
         Module mut = builder.module(name:'name') {
             expose {
                 resource (myResource)
-                to_script scriptPath
+                use_script scriptPath
             }
         }
         String xml = mut.buildModuleXml()
@@ -145,7 +135,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint request doesn't contain operator argument",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*/ +
                 scriptPath).find())
 
         assertTrue("Endpoint internal space doesn't contain groovy language import",
@@ -165,7 +155,7 @@ class EndpointTest extends GroovyTestCase {
         Module mut = builder.module () {
             expose {
                 resource (uri)
-                to_script scriptPath
+                use_script scriptPath
             }
         }
 
@@ -181,7 +171,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint request doesn't contain operator argument",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*/ +
                 scriptPath).find())
 
         assertTrue("Endpoint internal space doesn't contain groovy language import",
@@ -209,7 +199,7 @@ class EndpointTest extends GroovyTestCase {
         Module mut = builder.module () {
             expose {
                 resource(uri)
-                to_script scriptPath
+                use_script scriptPath
             }
         }
 
@@ -226,7 +216,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint request doesn't contain operator argument",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*/ +
                 scriptPath).find())
 
         assertTrue("Endpoint request doesn't contain argument arg1",
@@ -263,8 +253,8 @@ class EndpointTest extends GroovyTestCase {
 
         Module mut = builder.module () {
             expose {
-                resource(uri)
-                to_script scriptPath
+                resource (uri)
+                use_script scriptPath
                 with_argument (name: arg1, pass_by: 'value')
                 with_argument (name: arg2)
             }
@@ -274,7 +264,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint request doesn't contain operator argument",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*/ +
                 scriptPath).find())
 
         assertTrue("Argument {$arg1} doesn't contain method=as-string modifier" ,
@@ -293,8 +283,8 @@ class EndpointTest extends GroovyTestCase {
 
         Module mut = builder.module () {
             expose {
-                resource(uri)
-                to_script scriptPath
+                resource (uri)
+                use_script scriptPath
             }
         }
 
@@ -310,7 +300,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint request doesn't contain operator argument",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*/ +
                 scriptPath).find())
 
         assertTrue("Endpoint internal space doesn't contain javascript language import",
@@ -324,8 +314,8 @@ class EndpointTest extends GroovyTestCase {
 
         Module mut = builder.module () {
             expose {
-                resource(uri)
-                to_script scriptPath
+                resource (uri)
+                use_script scriptPath
             }
         }
 
@@ -341,7 +331,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint request doesn't contain operator argument",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*/ +
                 scriptPath).find())
 
         assertTrue("Endpoint internal space doesn't contain freemarker language import",
@@ -356,8 +346,8 @@ class EndpointTest extends GroovyTestCase {
 
         Module mut = builder.module () {
             expose {
-                resource(uri)
-                to_script scriptPath
+                resource (uri)
+                use_script scriptPath
             }
         }
 
@@ -377,15 +367,15 @@ class EndpointTest extends GroovyTestCase {
         Module mut = builder.module() {
             expose {
                 resource (expectedUri1)
-                to_script expectedScriptPath1
+                use_script expectedScriptPath1
             }
             expose {
                 resource (expectedUri2)
-                to_script expectedScriptPath2
+                use_script expectedScriptPath2
             }
             expose {
                 resource (expectedUri3)
-                to_script expectedScriptPath3
+                use_script expectedScriptPath3
             }
         }
 
@@ -405,7 +395,7 @@ class EndpointTest extends GroovyTestCase {
         Module mut = builder.module () {
             expose {
                 resource (uri)
-                to_script scriptPath
+                use_script scriptPath
             }
         }
 
@@ -421,7 +411,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint request doesn't contain operator argument",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*<script>/ +
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='operator'>.*/ +
                 scriptPath).find())
 
         assertTrue("Endpoint internal space doesn't contain groovy language import",
@@ -429,7 +419,27 @@ class EndpointTest extends GroovyTestCase {
                 /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:groovy/).find())
     }
 
+    void testCreateSampleModule() {
+        Module module =
+            builder.module (uri: 'urn:alex:test:module', name: 'my test module', version: '1.0.0', ) {
+                expose_to 'http'
+                expose {
+                    file_path 'res:/get-doc-file/(.*)'
+                    via_rewrite 'res:/resources/doc/$1'
+                }
+                expose {
+                    resource ('res:/test/hello/{user}')
+                    use_script 'res:/resources/scripts/test.ftl'
+                    with_argument (name: 'user', pass_by: 'value')
+                }
+                expose {
+                    resource ('res:/test/hello2/{user}')
+                    use_script 'res:/resources/scripts/myscript.groovy'
+                }
+            }
 
+        println module.buildModuleXml()
+    }
 
 // test for dpml
 
