@@ -8,109 +8,130 @@ class Module {
     String name
     String descrption
     boolean isOnFrontEnd = false
-    List<Endpoint> endpoints = [ ]
     List<Exposure> exposures = [ ]
 
     public String buildModuleXml() {
         def writer = new StringWriter()
         def xml = new MarkupBuilder(writer)
-        def thisEndpoint
 
         xml.module(version : '2.0') {
-            meta {
-                identity(null) {
-                    uri this.uri
-                    version this.version
-                }
-                info {
-                    name this.name
-                    description this.descrption
-                }
-            }
-            system {
-                dynamic()
-            }
+            buildModuleMeta(xml)
             rootspace {
-                if (this.isOnFrontEnd) {
-                    fileset {
-                        regex('res:/etc/system/SimpleDynamicImportHook.xml')
-                    }
-                }
-
-                this.exposures.each {
-                    def exposure = it
-                    fileset {
-                        regex(exposure.filePath)
-                        rewrite(exposure.rewriteUri)
-                    }
-                }
-
+                buildFrontEndFulcrumHook(xml)
+                buildSimpleExposures(xml)
                 mapper {
                     config {
-                        this.endpoints.each {
-                            thisEndpoint = it
-                            endpoint {
-                                grammar {
-                                    if (thisEndpoint.simpleGrammar) {
-                                        simple(thisEndpoint.simpleGrammar)
-                                    }
-                                    else {
-                                        if (thisEndpoint.resource) {
-                                            active {
-                                                identifier('active:' + thisEndpoint.resource.identifier)
+                        buildEndpoints(xml)
+                    }
+                    buildInnerSpace(xml)
+                }
+            }
+        }
 
-                                                thisEndpoint.resource.getArguments().each {
-                                                    argument(name: it.name, min: it.min, max: it.max)
-                                                }
+        writer.toString()
+    }
 
-                                                if (thisEndpoint.resource.varArgs) {
-                                                    varargs()
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+    def buildFrontEndFulcrumHook(xml) {
+        if (this.isOnFrontEnd) {
+            xml.fileset {
+                regex('res:/etc/system/SimpleDynamicImportHook.xml')
+            }
+        }
+    }
 
-                                if (thisEndpoint.scriptPath) {
-                                    request {
-                                        identifier('active:' + thisEndpoint.getLanguage())
-                                        argument(name: 'operator'){
-                                            script(thisEndpoint.scriptPath)
-                                        }
-                                        thisEndpoint.getArguments().each {
-                                            switch (it.passBy) {
-                                                case 'value':
-                                                    argument(name: it.name, method: "as-string", "[[arg:$it.name]]")
-                                                    break
-                                                default:
-                                                    argument(name: it.name, "[[arg:$it.name]]")
-                                                    break
-                                            }
-                                        }
-                                    }
-                                }
+    def buildModuleMeta(xml) {
+        xml.meta {
+            identity(null) {
+                uri this.uri
+                version this.version
+            }
+            info {
+                name this.name
+                description this.descrption
+            }
+        }
+        xml.system {
+            dynamic()
+        }
+    }
+
+    def buildSimpleExposures(xml) {
+        Exposure thisExposure
+        this.exposures.findAll { it.filePath }.each {
+            thisExposure = it
+            xml.fileset {
+                regex (thisExposure.filePath)
+                if (thisExposure.rewriteUri) {
+                    rewrite (thisExposure.rewriteUri)
+                }
+            }
+        }
+    }
+
+    def buildEndpoints(xml) {
+        Resource thisResource
+
+        this.exposures.findAll { it.resource }.each {
+            thisResource = it.resource
+            xml.endpoint {
+                grammar {
+                    if (thisResource.uri) {
+                        simple(thisResource.uri)
+                    }
+                    else {
+                        active {
+                            identifier('active:' + thisResource.identifier)
+
+                            thisResource.getArguments().each {
+                                argument(name: it.name, min: it.min, max: it.max)
+                            }
+
+                            if (thisResource.varArgs) {
+                                varargs()
                             }
                         }
                     }
+                }
 
-                    space {
-                        this.endpoints.each {
-                            thisEndpoint = it
-                            if (thisEndpoint.scriptPath) {
-                                'import' {
-                                    'uri' ('urn:org:netkernel:lang:' + thisEndpoint.getLanguage())
-                                }
-                                fileset {
-                                    regex (thisEndpoint.scriptPath)
-                                }
+                if (thisResource.scriptPath) {
+                    request {
+                        identifier('active:' + thisResource.getLanguage())
+                        argument(name: 'operator'){
+                            script(thisResource.scriptPath)
+                        }
+                        thisResource.getArguments().each {
+                            switch (it.passBy) {
+                                case 'value':
+                                    argument(name: it.name, method: "as-string", "[[arg:$it.name]]")
+                                    break
+                                default:
+                                    argument(name: it.name, "[[arg:$it.name]]")
+                                    break
                             }
                         }
                     }
                 }
             }
         }
+    }
 
-        writer.toString()
+    def buildInnerSpace(xml) {
+
+        Resource thisResource
+
+        xml.space {
+            this.exposures.findAll { it.resource }.each {
+                thisResource = it.resource
+                if (thisResource.scriptPath) {
+                    'import' {
+                        'uri' ('urn:org:netkernel:lang:' + thisResource.getLanguage())
+                    }
+                    fileset {
+                        regex (thisResource.scriptPath)
+                    }
+                }
+            }
+        }
     }
 
     public void setAttributes(Map attrs) {

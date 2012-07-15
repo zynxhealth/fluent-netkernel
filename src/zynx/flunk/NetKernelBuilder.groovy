@@ -9,16 +9,19 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 child.apply(parent)
                 break
 
-            case Endpoint:
-                parent.endpoints << child
-                break
-
             case Exposure:
                 parent.exposures << child
                 break
 
             case Argument:
-                parent.addArgument(child)
+                switch (parent.class) {
+                    case Resource:
+                        parent.addArgument(child)
+                        break
+                    case Exposure:
+                        parent.resource.addArgument(child)
+                        break
+                }
                 break
 
             case Resource:
@@ -43,18 +46,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 }
                 break
 
-           case 'simple_uri':
-               result = Manipulator.does { it.simpleGrammar = body }
-                break
-
-            case 'to_script':
-                result = Manipulator.does { it.scriptPath = body }
-                break
-
-            case 'to_groovy':
-                result = Manipulator.does { it.groovyScript = body }
-                break
-
+        // simple exposure properties
             case 'file_path':
                 result = Manipulator.does { it.filePath = body }
                 break
@@ -63,9 +55,29 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 result = Manipulator.does {it.rewriteUri = body }
                 break
 
+        // resource
             case 'resource':
                 result = instantiate(name)
-                result.identifier = body
+                result.initializeResource(body)
+                break
+
+        // resource exposure properties
+            case 'simple_uri':
+                result = Manipulator.does {
+                    if (!it.resource) {
+                        it.resource = new Resource()
+                    }
+                    it.resource.uri = body
+                }
+                break
+
+            case 'to_script':
+                result = Manipulator.does {
+                    if (!it.resource) {
+                        it.resource = new Resource()
+                    }
+                    it.resource.scriptPath = body
+                }
                 break
 
             case 'with_variable_arguments':
@@ -101,7 +113,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 break
 
             case 'map':
-                return new Endpoint()
+                return new Exposure()
                 break
 
             case 'expose':
