@@ -25,7 +25,18 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 break
 
             case Resource:
-                parent.resource = child
+                switch (parent.class) {
+                    case Exposure:
+                        parent.resource = child
+                        break
+                    case Sequence:
+                        parent.requests << child
+                        break
+                }
+                break
+
+            case Sequence:
+                parent.resource.sequence = child
                 break
         }
     }
@@ -73,15 +84,29 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
             case 'use_script':
                 result = Manipulator.does {
-                    if (!it.resource) {
-                        it.resource = new Resource()
+
+                    switch (it.class) {
+                        case Resource:
+                            it.scriptPath = body
+                            break
+
+                        case Exposure:
+                            if (!it.resource) {
+                                it.resource = new Resource()
+                            }
+                            it.resource.scriptPath = body
+                            break
                     }
-                    it.resource.scriptPath = body
                 }
                 break
 
             case 'with_variable_arguments':
                 result = Manipulator.does {it.varArgs = true }
+                break
+
+            case 'step':
+                result = instantiate(name)
+                result.initializeResource(body)
                 break
 
             default:
@@ -128,6 +153,13 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 return new Resource()
                 break
 
+            case 'use_sequence':
+                return new Sequence()
+                break
+
+            case 'step':
+                return new Resource()
+                break
         }
     }
 }

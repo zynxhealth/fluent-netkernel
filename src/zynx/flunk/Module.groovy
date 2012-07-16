@@ -110,12 +110,13 @@ class Module {
                         }
                     }
                 }
+                buildDPMLSequence(xml, thisResource)
             }
         }
     }
 
     def buildInnerSpace(xml) {
-        Resource thisResource
+        Resource thisResource, innerResource
 
         xml.space {
             this.exposures.findAll { it.resource }.each {
@@ -126,6 +127,51 @@ class Module {
                     }
                     fileset {
                         regex (thisResource.scriptPath)
+                    }
+                }
+                if (thisResource.sequence) {
+                    'import' {
+                        'uri' ('urn:org:netkernel:lang:dpml')
+                    }
+                    thisResource.sequence.requests.each {
+                        innerResource = it
+                        'import' {
+                            'uri' ('urn:org:netkernel:lang:' + innerResource.getLanguage())
+                        }
+                        fileset {
+                            regex (innerResource.scriptPath)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    def buildDPMLSequence(xml, thisResource) {
+        Resource innerResource
+        Argument thisArgument
+
+        if (thisResource.sequence) {
+
+            xml.request {
+                identifier('active:dpml')
+                argument(name:'operator') {
+                    sequence {
+                         thisResource.sequence.requests.each {
+                             innerResource = it
+                             request (assignment: innerResource.identifier) {
+                                 identifier('active:' + innerResource.getLanguage())
+                                 argument(name:'operator', innerResource.scriptPath)
+                                 innerResource.getArguments().each {
+                                     thisArgument = it
+                                     argument(name: thisArgument.name) {
+                                         if (thisArgument.value) {
+                                             literal (type: 'string', thisArgument.value)
+                                         }
+                                     }
+                                 }
+                             }
+                         }
                     }
                 }
             }

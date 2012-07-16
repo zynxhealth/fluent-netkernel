@@ -8,6 +8,7 @@ class Resource {
     String scriptPath
 
     List<Argument> arguments = []
+    Sequence sequence
 
     void initializeResource(String identifier) {
         this.identifier = identifier

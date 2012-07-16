@@ -2,24 +2,28 @@ package zynx.flunk
 
 class Argument {
     String name
+    String value
     String passBy
     String min = 1
     String max = 1
 
     public void setAttributes(Map attrs) {
-        attrs.each { key, value ->
+        attrs.each { key, val ->
             switch (key) {
                 case 'name':
-                    name = value
+                    name = val
                     break
                 case 'pass_by':
-                    passBy = value
+                    passBy = val
                     break
                 case 'min':
-                    min = value
+                    min = val
                     break
                 case 'max':
-                    max = value
+                    max = val
+                    break
+                case 'value':
+                    value = val
                     break
             }
         }

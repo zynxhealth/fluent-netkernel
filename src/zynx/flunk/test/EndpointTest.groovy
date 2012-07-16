@@ -87,7 +87,6 @@ class EndpointTest extends GroovyTestCase {
         }
 
         String xml = mut.buildModuleXml()
-        println xml
 
         assertTrue("Endpoint doesn't contain identifer for active grammar",
                 (xml.replace('\n', ' ') =~
@@ -438,9 +437,70 @@ class EndpointTest extends GroovyTestCase {
                 }
             }
 
-        println module.buildModuleXml()
+        //println module.buildModuleXml()
     }
 
+    void testCreateSimpleDPMLSequence() {
+        def resourceName = 'res:/run-dpml/'
+        def scriptPath = 'res:/resources/scripts/toUpper.ftl'
+        def argName = 'upperCaseMe'
+        def argValue = 'banana'
+
+        Module mut = builder.module() {
+            expose_to 'http'
+            expose {
+                resource (resourceName)
+
+                use_sequence {
+                    step ('response') {
+                        use_script scriptPath
+                        with_argument (name: argName, value: argValue)
+                    }
+                }
+            }
+        }
+
+        def xml = mut.buildModuleXml()
+
+        assertTrue("Endpoint doesn't contain simple grammar",
+                (xml.replace('\n', ' ') =~ /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<simple>.*/ + resourceName).find())
+
+        assertTrue("Endpoint doesn't contain active:dpml identifier",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>active:dpml/).find())
+
+        assertTrue("Endpoint request doesn't contain operator argument",
+                (xml.replace('\n', ' ') =~
+                /<request>.*<argument name='operator'>.*<sequence>/).find())
+
+        assertTrue("Sequence doesn't contain request 'response'",
+                (xml.replace('\n', ' ') =~
+                /<request>.*<identifier>active:dpml.*<sequence>.*<request assignment='response'/).find())
+
+        assertTrue("Sequence request doesn't contain operator argument with script $scriptPath",
+                (xml.replace('\n', ' ') =~
+                /<sequence>.*<request assignment='response'>.*<argument name='operator'>.*/ + scriptPath).find())
+
+        assertTrue("Sequence request contain argument $argName",
+                (xml.replace('\n', ' ') =~
+                /<sequence>.*<request assignment='response'>.*<argument name='/ + argName).find())
+
+        assertTrue("Sequence request contain argument $argName with value $argValue",
+                (xml.replace('\n', ' ') =~
+                /<sequence>.*<request assignment='response'>.*<argument name='/ + argName + /.*<literal type='string'>.*/ + argValue).find())
+
+        assertTrue("Endpoint internal space doesn't contain dpml import",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:dpml/).find())
+
+        assertTrue("Endpoint internal space doesn't contain freemarker language import",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:freemarker/).find())
+
+        assertTrue("Endpoint internal space doesn't contain fileset $scriptPath",
+                (xml.replace('\n', ' ') =~
+                /<mapper.*>.*<space.*>.*<fileset.*>.*<regex>/ + scriptPath).find())
+    }
 // test for dpml
 
 
