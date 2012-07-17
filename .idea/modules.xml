@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/fluent-netkernel.iml" filepath="$PROJECT_DIR$/fluent-netkernel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Fluent-netkernel.iml" filepath="$PROJECT_DIR$/Fluent-netkernel.iml" />
     </modules>
   </component>
 </project>

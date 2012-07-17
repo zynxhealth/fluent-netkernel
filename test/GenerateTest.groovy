@@ -1,6 +1,5 @@
 import zynx.flunk.Generate
 import zynx.flunk.Module
-import org.junit.Test
 import zynx.flunk.NetKernelBuilder
 
 class GenerateTest extends GroovyTestCase {
@@ -9,7 +8,7 @@ class GenerateTest extends GroovyTestCase {
 
         ByteArrayOutputStream output = new ByteArrayOutputStream()
 
-        String modulePath = '/home/pair/dev/fluent-netkernel/src/zynx/flunk/test/SampleModule.groovy'
+        String modulePath = '/home/pair/dev/fluent-netkernel/test-data/SampleModule.groovy'
         Generate gut = new Generate()
         NetKernelBuilder builder = new NetKernelBuilder()
 
@@ -34,10 +33,10 @@ class GenerateTest extends GroovyTestCase {
 
         System.setOut(new PrintStream(output))
 
-        gut.Main(modulePath)
+        gut.main(modulePath)
         String xml = output.toString()
         System.setOut(null)
 
-        assertTrue('XML returned from Main() is not valid', expectedXml == xml)
+        assertTrue('XML returned from main() is not valid', expectedXml == xml)
     }
 }

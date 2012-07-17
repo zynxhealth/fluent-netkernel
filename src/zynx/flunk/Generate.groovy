@@ -2,7 +2,7 @@ package zynx.flunk
 
 class Generate {
 
-    void Main(String[] args) {
+    public static void main(String[] args) {
         def filePath = args[0]
         File inFile = new File(filePath)
 
