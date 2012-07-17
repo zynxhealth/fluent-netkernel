@@ -1,5 +1,3 @@
-package zynx.flunk.test
-
 import zynx.flunk.Module
 import zynx.flunk.NetKernelBuilder
 import zynx.flunk.Argument
