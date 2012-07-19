@@ -1,4 +1,4 @@
-module (uri: 'urn:alex:test:module', name: 'my test module', version: '1.0.0') {
+module (uri: 'urn:flunk:testmodule', name: 'my test module', version: '1.0.0') {
     expose_to 'http'
     expose {
         file_path 'res:/get-doc-file/(.*)'
