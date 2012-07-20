@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<tests>
-	<test>
-		<id>test:urn:flunk:testmodule</id>
-		<name>Zynx.flunk test</name>
-		<desc>I am a test module for Zynx.flunk.  Ignore me.</desc>
-		<uri>res:/resources/test/testlist.xml</uri>
-	</test>
-</tests>

@@ -1,3 +1,4 @@
+package test
 module (uri: 'urn:flunk:testmodule', name: 'my test module', version: '1.0.0') {
     expose_to 'http'
     expose {

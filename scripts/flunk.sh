@@ -1,9 +1,10 @@
 #!/bin/bash
+SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 show_usage() {
 echo ${0##/*}" Usage:"
 echo "  Generate and Commission a Netkernel Module using the flunk DSL "
-echo "${0##/} -f MODULE_DEFINITION_FILE [-r MODULE_FOLDERS_DIRECTORY] [-m MODULES_DIRECTORY]"
+echo "${0##/} -s MODULE_DEFINITION_FILE [-f MODULE_FOLDERS_DIRECTORY] [-m MODULES_DIRECTORY]"
 echo "[-n NETKERNEL_ROOT_DIRECTORY]"
 exit
 }
@@ -23,15 +24,16 @@ if [[ $ARGC -lt $MINARGS ]] ; then
 fi
 
 MODULE_FOLDERS_DIRECTORY=""
-FLUNK_PATH="./out/artifacts/flunk_jar"
-MODULES_DIR="/home/pair/dev/galen/platform/netkernel-modules"
 NETKERNEL_ROOT_DIRECTORY=""
 
-while getopts f:r:m:n: opt 
+FLUNK_PATH=$SCRIPT_HOME
+MODULES_DIR=$SCRIPT_HOME
+
+while getopts s:f:m:n: opt 
 do 
 	case "$opt" in
-		f) MODULE_FILE=$OPTARG;;
-		r) MODULE_FOLDERS_DIRECTORY=$OPTARG;;
+		s) MODULE_FILE=$OPTARG;;
+		f) MODULE_FOLDERS_DIRECTORY=$OPTARG;;
 		m) MODULES_DIR=$OPTARG;;
 		n) NETKERNEL_ROOT_DIRECTORY=$OPTARG;;
 		[?]) show_usage;;
@@ -39,7 +41,8 @@ do
 done
 
 echo "Generating module XML"
-java -jar $FLUNK_PATH/Fluent-netkernel.jar $MODULE_FILE > module_temp
+echo `pwd`
+java -jar $FLUNK_PATH/flunk.jar $MODULE_FILE > module_temp
 
 MODULE_NAME=$(grep -m 1 "<uri>.*</uri>" module_temp | sed 's/.*<uri>//' | sed 's/<\/uri>.*//' | sed 's/:/./g')
 
@@ -50,13 +53,14 @@ else
 	mkdir $MODULES_DIR/$MODULE_NAME
 fi	
 
+echo "Creating module XML at $MODULES_DIR/$MODULE_NAME/module.xml"
 mv module_temp $MODULES_DIR/$MODULE_NAME/module.xml
 rm -f module_temp
 
 if [[ -n $MODULE_FOLDERS_DIRECTORY ]]; then
 	echo "Adding module folders to $MODULE_FOLDERS_DIRECTORY"
 
-	cp -r $MODULE_FOLDERS_DIRECTORY/* $MODULES_DIR/$MODULE_NAME/
+	cp -vr $MODULE_FOLDERS_DIRECTORY/* $MODULES_DIR/$MODULE_NAME/
 fi
 
 if [[ -n $NETKERNEL_ROOT_DIRECTORY ]]; then
