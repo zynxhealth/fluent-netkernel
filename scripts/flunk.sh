@@ -23,6 +23,7 @@ if [[ $ARGC -lt $MINARGS ]] ; then
  show_usage
 fi
 
+MODULE_FILE=""
 MODULE_FOLDERS_DIRECTORY=""
 NETKERNEL_ROOT_DIRECTORY=""
 
@@ -40,11 +41,21 @@ do
 	esac
 done
 
+if [[ -z $MODULE_FILE ]]; then
+	echo "No module.groovy file given, exiting"
+	exit
+fi
+
 echo "Generating module XML"
 echo `pwd`
 java -jar $FLUNK_PATH/flunk.jar $MODULE_FILE > module_temp
 
-MODULE_NAME=$(grep -m 1 "<uri>.*</uri>" module_temp | sed 's/.*<uri>//' | sed 's/<\/uri>.*//' | sed 's/:/./g')
+MODULE_NAME=$(grep -m 1 "<uri>.*</uri>" module_temp | sed 's/.*<uri>//' | sed 's/<\/uri>.*//' | sed 's/:/./g' | tr -d ' ')
+
+MODULE_FILE=$(echo $MODULE_FILE | tr -d ' ')
+MODULES_DIR=$(echo $MODULES_DIR | tr -d ' ')
+MODULE_FOLDERS_DIRECTORY=$(echo $MODULE_FOLDERS_DIRECTORY | tr -d ' ')
+NETKERNEL_ROOT_DIRECTORY=$(echo $NETKERNEL_ROOT_DIRECTORY | tr -d ' ')
 
 if [[ -d $MODULES_DIR/$MODULE_NAME ]]; then
 	echo "Directory $MODULES_DIR/$MODULE_NAME already exists"
@@ -54,8 +65,8 @@ else
 fi	
 
 echo "Creating module XML at $MODULES_DIR/$MODULE_NAME/module.xml"
+rm -f $MODULES_DIR/$MODULE_NAME/module.xml
 mv module_temp $MODULES_DIR/$MODULE_NAME/module.xml
-rm -f module_temp
 
 if [[ -n $MODULE_FOLDERS_DIRECTORY ]]; then
 	echo "Adding module folders to $MODULE_FOLDERS_DIRECTORY"
