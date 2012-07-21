@@ -75,8 +75,18 @@ if [[ -n $MODULE_FOLDERS_DIRECTORY ]]; then
 fi
 
 if [[ -n $NETKERNEL_ROOT_DIRECTORY ]]; then
-	echo "Adding ${MODULE_NAME}.xml to ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d"
-	echo "<modules><module>file:${MODULES_DIR}/${MODULE_NAME}/</module></modules>" > ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml
+	echo "<modules><module>file:${MODULES_DIR}/${MODULE_NAME}/</module></modules>" > commission_temp
+
+	if [[ -ne ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml ||
+			-n $(diff commission_temp ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml) ]]; then
+		echo "Adding ${MODULE_NAME}.xml to ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d"
+		echo "<modules><module>file:${MODULES_DIR}/${MODULE_NAME}/</module></modules>" > ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml
+	else
+		echo "No changes detected in module location, skipping deployment configuration"
+	fi
+
+	rm -f commission_temp
+	
 else
 	echo "Skipping deployment"
 fi
