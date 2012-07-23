@@ -75,10 +75,16 @@ if [[ -n $MODULE_FOLDERS_DIRECTORY ]]; then
 fi
 
 if [[ -n $NETKERNEL_ROOT_DIRECTORY ]]; then
+	echo "Netkernel root directory found, beginning commissioning"
 	echo "<modules><module>file:${MODULES_DIR}/${MODULE_NAME}/</module></modules>" > commission_temp
+	echo "${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml"
 
-	if [[ -ne ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml ||
-			-n $(diff commission_temp ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml) ]]; then
+	DIFF_RESULT=$(diff commission_temp ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml)
+	echo $DIFF_RESULT
+
+
+
+	if [[ ! -e ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml || -n $DIFF_RESULT ]]; then
 		echo "Adding ${MODULE_NAME}.xml to ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d"
 		echo "<modules><module>file:${MODULES_DIR}/${MODULE_NAME}/</module></modules>" > ${NETKERNEL_ROOT_DIRECTORY}/etc/modules.d/${MODULE_NAME}.xml
 	else
