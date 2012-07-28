@@ -7,7 +7,7 @@ class GenerateTest extends GroovyTestCase {
     void testAcceptModuleFileAndReturnXML() {
 
         ByteArrayOutputStream output = new ByteArrayOutputStream()
-        String modulePath = '/home/pair/dev/fluent-netkernel/test-data/SampleModule.groovy'
+        String modulePath = System.getProperty("user.dir") + '/test/test-data/SampleModule.groovy'
         Generate gut = new Generate()
         NetKernelBuilder builder = new NetKernelBuilder()
 

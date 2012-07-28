@@ -9,11 +9,13 @@ class Resource {
 
     List<Argument> arguments = []
     Sequence sequence
+    Request request
 
-    void initializeResource(String identifier) {
+    void setIdentifier(String identifier) {
         this.identifier = identifier
+
         if (identifier.startsWith('res:/')) {
-            uri = identifier
+            this.uri = identifier
         }
     }
 

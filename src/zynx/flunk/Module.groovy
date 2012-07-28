@@ -31,7 +31,7 @@ class Module {
         writer.toString()
     }
 
-    def buildFrontEndFulcrumHook(xml) {
+    private def buildFrontEndFulcrumHook(xml) {
         if (this.isOnFrontEnd) {
             xml.fileset {
                 regex('res:/etc/system/SimpleDynamicImportHook.xml')
@@ -39,7 +39,7 @@ class Module {
         }
     }
 
-    def buildModuleMeta(xml) {
+    private def buildModuleMeta(xml) {
         xml.meta {
             identity(null) {
                 uri this.uri
@@ -55,7 +55,7 @@ class Module {
         }
     }
 
-    def buildSimpleExposures(xml) {
+    private def buildSimpleExposures(xml) {
         Exposure thisExposure
 
         this.exposures.findAll { it.filePath }.each {
@@ -69,7 +69,7 @@ class Module {
         }
     }
 
-    def buildEndpoints(xml) {
+    private def buildEndpoints(xml) {
         Resource thisResource
 
         this.exposures.findAll { it.resource }.each {
@@ -94,41 +94,83 @@ class Module {
                     }
                 }
 
-                if (thisResource.scriptPath) {
-                    request {
-                        identifier('active:' + thisResource.getLanguage())
-                        argument(name: 'operator', thisResource.scriptPath)
-                        thisResource.getArguments().each {
-                            switch (it.passBy) {
-                                case 'value':
-                                    argument(name: it.name, method: "as-string", "[[arg:$it.name]]")
-                                    break
-                                default:
-                                    argument(name: it.name, "[[arg:$it.name]]")
-                                    break
-                            }
-                        }
-                    }
-                }
+                buildRequest(xml, thisResource.request)
+
+//                if (thisResource.scriptPath) {
+//                    request {
+//                        identifier('active:' + thisResource.getLanguage())
+//                        argument(name: 'operator', thisResource.scriptPath)
+//                        thisResource.getArguments().each {
+//                            switch (it.passBy) {
+//                                case 'value':
+//                                    argument(name: it.name, method: "as-string", "[[arg:$it.name]]")
+//                                    break
+//                                default:
+//                                    argument(name: it.name, "[[arg:$it.name]]")
+//                                    break
+//                            }
+//                        }
+//                    }
+//                }
                 buildDPMLSequence(xml, thisResource)
             }
         }
     }
 
-    def buildInnerSpace(xml) {
+    private def buildRequest(xml, Request thisRequest) {
+        if(thisRequest) {
+
+            xml.request {
+                identifier(thisRequest.identifier)
+                thisRequest.arguments.each {
+                    switch (it.passBy) {
+                        case 'value':
+                            argument(name: it.name, method: "as-string", it.value)
+                            break
+                        default:
+                            argument(name: it.name, it.value)
+                            break
+                    }
+                }
+            }
+        }
+    }
+
+    private def buildInnerSpace(xml) {
         Resource thisResource, innerResource
+        Request thisRequest
+        Import thisImport
 
         xml.space {
             this.exposures.findAll { it.resource }.each {
                 thisResource = it.resource
-                if (thisResource.scriptPath) {
-                    'import' {
-                        'uri' ('urn:org:netkernel:lang:' + thisResource.getLanguage())
+                thisRequest = thisResource.request
+
+                if (thisRequest) {
+                    thisRequest.imports.each {
+                        thisImport = it
+                        'import' {
+                            'uri' (thisImport.uri)
+                        }
                     }
-                    fileset {
-                        regex (thisResource.scriptPath)
+
+                    if (thisRequest.resourcePath) {
+                        fileset {
+                            regex (thisRequest.resourcePath)
+                        }
                     }
+
                 }
+
+//                if (thisResource.scriptPath) {
+//                    'import' {
+//                        'uri' ('urn:org:netkernel:lang:' + thisResource.getLanguage())
+//                    }
+//                    fileset {
+//                        regex (thisResource.scriptPath)
+//                    }
+//                }
+
                 if (thisResource.sequence) {
                     'import' {
                         'uri' ('urn:org:netkernel:lang:dpml')
@@ -147,7 +189,7 @@ class Module {
         }
     }
 
-    def buildDPMLSequence(xml, thisResource) {
+    private def buildDPMLSequence(xml, thisResource) {
         Resource innerResource
         Argument thisArgument
 

@@ -4,6 +4,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
     @Override
     protected void setParent(Object parent, Object child) {
+//        Console.println 'Associating parent ' + parent + ' with child ' + child
         switch (child.class) {
             case Manipulator:
                 child.apply(parent)
@@ -20,6 +21,9 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                         break
                     case Exposure:
                         parent.resource.addArgument(child)
+                        break
+                    case Request:
+                        parent.arguments << child
                         break
                 }
                 break
@@ -38,70 +42,79 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
             case Sequence:
                 parent.resource.sequence = child
                 break
+
+            case Request:
+                switch (parent.class) {
+                    case Exposure:
+                        parent.resource.request = child
+                        break
+                    case Resource:
+                        parent.request = child
+                        break
+                }
+                break
         }
     }
 
     @Override
     protected Object createNode(Object name) {
+//        Console.println 'Just a node: ' + name
         return instantiate(name)
     }
 
     @Override
     protected Object createNode(Object name, Object body) {
+//        Console.println 'Node with body: ' + name + ', body: ' + body.toString()
+
         Object result
 
         switch (name) {
             case 'expose_to':
                 if (body.toString() == 'http') {
-                    result = Manipulator.does { it.isOnFrontEnd = true }
+                    result = Manipulator.does {it.isOnFrontEnd = true }
                 }
                 break
 
-        // simple exposure properties
             case 'file_path':
-                result = Manipulator.does { it.filePath = body }
+                result = Manipulator.does {it.filePath = body }
                 break
 
             case 'via_rewrite':
                 result = Manipulator.does {it.rewriteUri = body }
                 break
 
-        // resource
             case 'resource':
                 result = instantiate(name)
-                result.initializeResource(body)
-                break
-
-        // resource exposure properties
-            case 'simple_uri':
-                result = Manipulator.does {
-                    if (!it.resource) {
-                        it.resource = new Resource()
-                    }
-                    it.resource.uri = body
-                }
+                result.identifier = body
                 break
 
             case 'use_script':
+                result = new Request()
+                result.processScript(body)
+                break
+
+            case 'with_varargs':
                 result = Manipulator.does {
-
-                    switch (it.class) {
-                        case Resource:
-                            it.scriptPath = body
-                            break
-
-                        case Exposure:
-                            if (!it.resource) {
-                                it.resource = new Resource()
-                            }
-                            it.resource.scriptPath = body
-                            break
-                    }
+                    it.varArgs = true
                 }
                 break
 
-            case 'with_variable_arguments':
-                result = Manipulator.does {it.varArgs = true }
+            case 'make_request_to':
+                result = Manipulator.does {
+                    if (!it.request) {
+                        it.request = new Request()
+                    }
+                    it.request.identifier = body
+                }
+                break
+
+            case 'defined_in':
+                result = Manipulator.does {
+                    if (!it.request) {
+                        it.request = new Request()
+                    }
+                    it.request.imports << new Import(uri: body)
+                }
                 break
 
             case 'step':
@@ -119,6 +132,8 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
     @Override
     protected Object createNode(Object name, Map attrs) {
+//        Console.println 'Node with attrs: ' + name + ', attrs: ' + attrs.toString()
+
         def x = instantiate(name)
         x.setAttributes(attrs)
         return x
@@ -126,6 +141,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
     @Override
     protected Object createNode(Object name, Map attrs, Object body) {
+//         Console.println 'Node with attrs and body: ' + name + ', attrs: ' + attrs.toString() + ', body: ' + body.toString()
         def x = instantiate(name)
         x.setAttributes(attrs)
         return x
