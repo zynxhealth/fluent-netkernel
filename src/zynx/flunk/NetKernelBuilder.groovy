@@ -73,6 +73,12 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 }
                 break
 
+            case 'isolate_dependencies':
+                if (body == true) {
+                    result = Manipulator.does { it.setupImplSpace = true }
+                }
+                break
+
             case 'file_path':
                 result = Manipulator.does { it.filePath = body }
                 break

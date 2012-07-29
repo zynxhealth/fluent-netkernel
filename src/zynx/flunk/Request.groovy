@@ -5,7 +5,7 @@ class Request {
     List<Argument> arguments = []
     List<Import> imports = []
     String resourcePath
-    Boolean varArgs
+    boolean varArgs
 
     void processScript(String scriptPath) {
         String language = getLanguage(scriptPath)

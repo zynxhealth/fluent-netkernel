@@ -3,6 +3,9 @@ module (uri: 'urn:flunk:testmodule', name: 'my test module', version: '1.0.0') {
     // hook rootspace into front-end fulcrum
     expose_to 'http'
 
+    // create separate rootspaces for implementation and execution
+    isolate_dependencies true
+
     // add simple fileset
     expose {
         file_path 'res:/get-doc-file/(.*)'

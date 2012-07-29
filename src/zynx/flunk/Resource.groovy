@@ -2,7 +2,7 @@ package zynx.flunk
 
 class Resource {
     String identifier
-    Boolean varArgs
+    boolean varArgs
     String uri
 
     List<Argument> arguments = []

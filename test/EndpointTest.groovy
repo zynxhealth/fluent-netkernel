@@ -487,6 +487,54 @@ class EndpointTest extends GroovyTestCase {
     }
 
 
+    void testSetupImplSpace() {
+        def moduleName = 'Math Functions'
+        def moduleUri = 'urn:my:math:functions'
+        def myResource = 'active:myResource'
+        def anotherResource = 'active:anotherResource'
+        def resourceSpace = 'urn:another:resource:space'
+
+        Module mut = builder.module (name: moduleName, uri: moduleUri) {
+            isolate_dependencies true
+
+            expose {
+                resource (myResource) {
+                    make_request_to (anotherResource) {
+                        defined_in resourceSpace
+                    }
+                }
+            }
+        }
+
+        String xml = mut.buildModuleXml()
+
+        println xml
+
+        assertTrue("Module doesn't contain implementation space '$moduleName - Impl'",
+                (xml.replace('\n', ' ') =~
+                /<rootspace name='/ + moduleName + / - Impl'/).find())
+
+        assertTrue("Implementation space doesn't have a uri $moduleUri:impl",
+                (xml.replace('\n', ' ') =~
+                /<rootspace name='/ + moduleName + / - Impl'.*uri='/ + moduleUri + /:impl'/).find())
+
+        assertTrue("Module doesn't contain execution space '$moduleName'",
+                (xml.replace('\n', ' ') =~
+                /<rootspace name='/ + moduleName + /'/).find())
+
+        assertTrue("Execution space doesn't have a uri $moduleUri",
+                (xml.replace('\n', ' ') =~
+                /<rootspace name='/ + moduleName + /'.*uri='/ + moduleUri + /'/).find())
+
+        assertTrue("Endpoint not found in implementation space",
+                (xml.replace('\n', ' ') =~
+                /<rootspace name='/ + moduleName + /'.*<mapper.*>.*<config.*>.*<endpoint.*>/).find())
+
+        assertTrue("Import for $resourceSpace not found in execution space",
+                (xml.replace('\n', ' ') =~
+                /<rootspace name='/ + moduleName + /'.*<import.*>.*<uri>/ + resourceSpace).find())
+    }
+
     void testCreateSampleModule() {
         Module module =
             builder.module (uri: 'urn:alex:test:module', name: 'my test module', version: '1.0.0', ) {

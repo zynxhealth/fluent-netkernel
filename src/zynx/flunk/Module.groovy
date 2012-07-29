@@ -8,6 +8,8 @@ class Module {
     String name
     String description
     boolean isOnFrontEnd = false
+    boolean setupImplSpace = false
+
     List<Exposure> exposures = [ ]
 
     public String buildModuleXml() {
@@ -15,15 +17,38 @@ class Module {
         def xml = new MarkupBuilder(writer)
 
         xml.module(version : '2.0') {
-            buildModuleMeta(xml)
-            rootspace {
-                buildFrontEndFulcrumHook(xml)
-                buildSimpleExposures(xml)
-                mapper {
-                    config {
-                        buildEndpoints(xml)
+
+            if (setupImplSpace) {
+                // execution space
+                rootspace (name: this.name, uri: this.uri) {
+                    buildFrontEndFulcrumHook(xml)
+                    buildDependencies(xml)
+                }
+
+                // implementation space
+                rootspace (name: this.name + ' - Impl', uri: this.uri + ':impl') {
+                    buildSimpleExposures(xml)
+                    mapper {
+                        config {
+                            buildEndpoints(xml)
+                        }
+                        space {}
                     }
-                    buildInnerSpace(xml)
+                }
+            }
+            else {
+                buildModuleMeta(xml)
+                rootspace {
+                    buildFrontEndFulcrumHook(xml)
+                    buildSimpleExposures(xml)
+                    mapper {
+                        config {
+                            buildEndpoints(xml)
+                        }
+                        space {
+                            buildDependencies(xml)
+                        }
+                    }
                 }
             }
         }
@@ -116,43 +141,41 @@ class Module {
         }
     }
 
-    private def buildInnerSpace(xml) {
+    private def buildDependencies(xml) {
         Resource thisResource, innerResource
         Request thisRequest
         Import thisImport
 
-        xml.space {
-            this.exposures.findAll { it.resource }.each {
-                thisResource = it.resource
-                thisRequest = thisResource.request
+        this.exposures.findAll { it.resource }.each {
+            thisResource = it.resource
+            thisRequest = thisResource.request
 
-                if (thisRequest) {
-                    thisRequest.imports.each {
-                        thisImport = it
-                        'import' {
-                            'uri' (thisImport.uri)
-                        }
-                    }
-
-                    if (thisRequest.resourcePath) {
-                        fileset {
-                            regex (thisRequest.resourcePath)
-                        }
+            if (thisRequest) {
+                thisRequest.imports.each {
+                    thisImport = it
+                    xml.'import' {
+                        'uri' (thisImport.uri)
                     }
                 }
 
-                if (thisResource.sequence) {
-                    'import' {
-                        'uri' ('urn:org:netkernel:lang:dpml')
+                if (thisRequest.resourcePath) {
+                    xml.fileset {
+                        regex (thisRequest.resourcePath)
                     }
-                    thisResource.sequence.requests.each {
-                        innerResource = it
-                        'import' {
-                            'uri' ('urn:org:netkernel:lang:' + innerResource.getLanguage())
-                        }
-                        fileset {
-                            regex (innerResource.scriptPath)
-                        }
+                }
+            }
+
+            if (thisResource.sequence) {
+                xml.'import' {
+                    'uri' ('urn:org:netkernel:lang:dpml')
+                }
+                thisResource.sequence.requests.each {
+                    innerResource = it
+                    xml.'import' {
+                        'uri' ('urn:org:netkernel:lang:' + innerResource.getLanguage())
+                    }
+                    xml.fileset {
+                        regex (innerResource.scriptPath)
                     }
                 }
             }
