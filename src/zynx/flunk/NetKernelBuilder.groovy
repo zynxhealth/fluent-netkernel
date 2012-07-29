@@ -101,7 +101,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 break
 
             case 'defined_in':
-                result = Manipulator.does { it.request.imports << new Import(uri: body) }
+                result = Manipulator.does { it.imports << new Import(uri: body) }
                 break
 
             case 'step':

@@ -81,7 +81,7 @@ class Module {
                     }
                     else {
                         active {
-                            identifier('active:' + thisResource.identifier)
+                            identifier(thisResource.identifier)
                             thisResource.getArguments().each {
                                 argument(name: it.name, min: it.min, max: it.max)
                             }

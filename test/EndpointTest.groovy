@@ -27,7 +27,7 @@ class EndpointTest extends GroovyTestCase {
     }
 
     void testSpecifyActiveGrammar(){
-        def myResource = 'myResource'
+        def myResource = 'active:myResource'
         def arg1 = 'arg1'
         def arg2 = 'arg2'
 
@@ -47,7 +47,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint doesn't contain identifer for active grammar",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<identifier>active:/ + myResource).find())
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<identifier>/ + myResource).find())
         assertTrue("Grammar doesn't contain the argument {$arg1}" ,
                 (xml.replace('\n', ' ') =~
                 /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<argument name='/+ arg1 + /'/).find())
@@ -75,7 +75,7 @@ class EndpointTest extends GroovyTestCase {
     }
 
     void testAssociateActiveGrammarToGroovyScript() {
-        def myResource = 'myResource'
+        def myResource = 'active:myResource'
         def arg1 = 'arg1'
         def scriptPath = 'res:/resources/scripts/myscript.groovy'
 
@@ -92,7 +92,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint doesn't contain identifer for active grammar",
                 (xml.replace('\n', ' ') =~
-                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<identifier>active:/ + myResource).find())
+                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<identifier>/ + myResource).find())
         assertTrue("Grammar doesn't contain the argument {$arg1}" ,
                 (xml.replace('\n', ' ') =~
                         /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<argument name='/+ arg1 + /'/).find())
@@ -113,15 +113,16 @@ class EndpointTest extends GroovyTestCase {
     }
 
     void testCreateRequestFromResource() {
-        def myResource = 'myResource'
+        def myResource = 'active:myResource'
         def anotherResource = 'active:anotherResource'
         def resourceSpace = 'urn:another:resource:space'
 
         Module mut = builder.module () {
             expose {
                 resource (myResource) {
-                    make_request_to anotherResource
-                    defined_in resourceSpace
+                    make_request_to (anotherResource) {
+                        defined_in resourceSpace
+                    }
                 }
             }
         }
@@ -130,7 +131,7 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint doesn't contain identifer for active grammar",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<identifier>active:/ + myResource).find())
+                /<mapper.*>.*<config.*>.*<endpoint.*>.*<grammar>.*<active*>.*<identifier>/ + myResource).find())
 
         assertTrue("Endpoint doesn't contain request to resource $anotherResource",
                 (xml.replace('\n', ' ') =~
@@ -142,7 +143,7 @@ class EndpointTest extends GroovyTestCase {
     }
 
     void testCreateRequestWithArguments() {
-        def myResource = 'myResource'
+        def myResource = 'active:myResource'
         def anotherResource = 'active:anotherResource'
         def resourceSpace = 'urn:another:resource:space'
         def argName = 'myArgument'
@@ -153,8 +154,8 @@ class EndpointTest extends GroovyTestCase {
                 resource (myResource) {
                     make_request_to (anotherResource) {
                         with_argument (name: argName, value: argValue)
+                        defined_in resourceSpace
                     }
-                    defined_in resourceSpace
                 }
             }
         }
