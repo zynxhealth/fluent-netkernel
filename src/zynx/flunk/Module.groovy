@@ -82,36 +82,16 @@ class Module {
                     else {
                         active {
                             identifier('active:' + thisResource.identifier)
-
                             thisResource.getArguments().each {
                                 argument(name: it.name, min: it.min, max: it.max)
                             }
-
                             if (thisResource.varArgs) {
                                 varargs()
                             }
                         }
                     }
                 }
-
                 buildRequest(xml, thisResource.request)
-
-//                if (thisResource.scriptPath) {
-//                    request {
-//                        identifier('active:' + thisResource.getLanguage())
-//                        argument(name: 'operator', thisResource.scriptPath)
-//                        thisResource.getArguments().each {
-//                            switch (it.passBy) {
-//                                case 'value':
-//                                    argument(name: it.name, method: "as-string", "[[arg:$it.name]]")
-//                                    break
-//                                default:
-//                                    argument(name: it.name, "[[arg:$it.name]]")
-//                                    break
-//                            }
-//                        }
-//                    }
-//                }
                 buildDPMLSequence(xml, thisResource)
             }
         }
@@ -159,17 +139,7 @@ class Module {
                             regex (thisRequest.resourcePath)
                         }
                     }
-
                 }
-
-//                if (thisResource.scriptPath) {
-//                    'import' {
-//                        'uri' ('urn:org:netkernel:lang:' + thisResource.getLanguage())
-//                    }
-//                    fileset {
-//                        regex (thisResource.scriptPath)
-//                    }
-//                }
 
                 if (thisResource.sequence) {
                     'import' {

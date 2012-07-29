@@ -5,6 +5,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
     @Override
     protected void setParent(Object parent, Object child) {
 //        Console.println 'Associating parent ' + parent + ' with child ' + child
+
         switch (child.class) {
             case Manipulator:
                 child.apply(parent)
@@ -58,29 +59,26 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
     @Override
     protected Object createNode(Object name) {
-//        Console.println 'Just a node: ' + name
         return instantiate(name)
     }
 
     @Override
     protected Object createNode(Object name, Object body) {
-//        Console.println 'Node with body: ' + name + ', body: ' + body.toString()
-
         Object result
 
         switch (name) {
             case 'expose_to':
                 if (body.toString() == 'http') {
-                    result = Manipulator.does {it.isOnFrontEnd = true }
+                    result = Manipulator.does { it.isOnFrontEnd = true }
                 }
                 break
 
             case 'file_path':
-                result = Manipulator.does {it.filePath = body }
+                result = Manipulator.does { it.filePath = body }
                 break
 
             case 'via_rewrite':
-                result = Manipulator.does {it.rewriteUri = body }
+                result = Manipulator.does { it.rewriteUri = body }
                 break
 
             case 'resource':
@@ -94,27 +92,16 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 break
 
             case 'with_varargs':
-                result = Manipulator.does {
-                    it.varArgs = true
-                }
+                result = Manipulator.does { it.varArgs = true }
                 break
 
             case 'make_request_to':
-                result = Manipulator.does {
-                    if (!it.request) {
-                        it.request = new Request()
-                    }
-                    it.request.identifier = body
-                }
+                result = instantiate(name)
+                result.identifier = body
                 break
 
             case 'defined_in':
-                result = Manipulator.does {
-                    if (!it.request) {
-                        it.request = new Request()
-                    }
-                    it.request.imports << new Import(uri: body)
-                }
+                result = Manipulator.does { it.request.imports << new Import(uri: body) }
                 break
 
             case 'step':
@@ -132,8 +119,6 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
     @Override
     protected Object createNode(Object name, Map attrs) {
-//        Console.println 'Node with attrs: ' + name + ', attrs: ' + attrs.toString()
-
         def x = instantiate(name)
         x.setAttributes(attrs)
         return x
@@ -141,7 +126,6 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
     @Override
     protected Object createNode(Object name, Map attrs, Object body) {
-//         Console.println 'Node with attrs and body: ' + name + ', attrs: ' + attrs.toString() + ', body: ' + body.toString()
         def x = instantiate(name)
         x.setAttributes(attrs)
         return x
@@ -175,6 +159,10 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
             case 'step':
                 return new Resource()
+                break
+
+            case 'make_request_to':
+                return new Request()
                 break
         }
     }

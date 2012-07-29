@@ -1,7 +1,6 @@
 package zynx.flunk
 
 class Request {
-
     String identifier
     List<Argument> arguments = []
     List<Import> imports = []

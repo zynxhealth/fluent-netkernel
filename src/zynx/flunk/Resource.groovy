@@ -5,8 +5,6 @@ class Resource {
     Boolean varArgs
     String uri
 
-    String scriptPath
-
     List<Argument> arguments = []
     Sequence sequence
     Request request
@@ -33,18 +31,4 @@ class Resource {
             arguments << arg
         }
     }
-
-    String getLanguage() {
-        switch (scriptPath) {
-            case ~/.*\.js/:
-                return 'javascript'
-            case ~/.*\.(groovy|gy)/:
-                return 'groovy'
-            case ~/.*\.(ftl)/:
-                return 'freemarker'
-            default:
-                throw new Exception("Script path '$scriptPath' is either empty or it references unknown language")
-        }
-    }
-
 }
