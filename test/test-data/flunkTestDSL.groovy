@@ -7,8 +7,8 @@ tests(mutName: 'Flunk Sample Module', version: '1.0.0', mutUri: 'urn:flunk:sampl
 
         assert_response {
             stringEquals 'this is an httpGet mock'
-            minTime '10'
-            maxTime '20'
+            minTime 10
+            maxTime 20
         }
 
         mock_resource ('active:httpGet') {

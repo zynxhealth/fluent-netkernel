@@ -29,7 +29,7 @@ class TestList {
 
         Test thisTest
 
-        xml.testlist(version : '2.0') {
+        xml.testlist {
             tests.each {
                 thisTest = it
                 test (name: thisTest.name) {
@@ -78,7 +78,7 @@ class TestList {
     }
 
     private def buildTestSpace(xml)  {
-        xml.rootspace (name: "$mutName - Tests", uri: "$mutUri:tests") {
+        xml.rootspace (name: "$mutName - Tests", uri: "$mutUri:test") {
 
             fileset {
                 regex('res:/etc/system/Tests.xml')
@@ -162,7 +162,7 @@ class TestList {
     private def buildModuleMeta(xml) {
         xml.meta {
             identity(null) {
-                uri this.mutUri + ':tests'
+                uri this.mutUri + ':test'
                 version this.version
             }
             info {
