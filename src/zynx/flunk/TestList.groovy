@@ -8,6 +8,8 @@ class TestList {
     String mutUri
     String description
 
+    List<Test> tests = []
+
     public String buildModuleXml() {
         def writer = new StringWriter()
         def xml = new MarkupBuilder(writer)
@@ -22,9 +24,58 @@ class TestList {
     }
 
     public String buildTestListXml() {
-        return ''
+        def writer = new StringWriter()
+        def xml = new MarkupBuilder(writer)
+
+        Test thisTest
+
+        xml.testlist(version : '2.0') {
+            tests.each {
+                thisTest = it
+                test (name: thisTest.name) {
+                    if (thisTest.request) {
+                        request {
+                            identifier (thisTest.request.identifier)
+                            thisTest.request.arguments.each {
+                                switch (it.passBy) {
+                                    case 'value':
+                                        argument(name: it.name, method: "as-string", it.value)
+                                        break
+                                    default:
+                                        argument(name: it.name, it.value)
+                                        break
+                                }
+                            }
+                        }
+                        buildAsserts(xml, thisTest)
+                    }
+                }
+            }
+        }
+
+        writer.toString()
     }
 
+
+    private def buildAsserts(xml, test) {
+        Assert thisAssert
+
+        test.asserts.each {
+            thisAssert = it
+            xml.'assert' {
+                if (thisAssert.stringEquals) {
+                    stringEquals (thisAssert.stringEquals)
+                }
+                if (thisAssert.minTime) {
+                    minTime (thisAssert.minTime)
+                }
+                if (thisAssert.maxTime) {
+                    maxTime (thisAssert.maxTime)
+                }
+            }
+        }
+
+    }
 
     private def buildTestSpace(xml)  {
         xml.rootspace (name: "$mutName - Tests", uri: "$mutUri:tests") {
@@ -59,8 +110,52 @@ class TestList {
     }
 
     private def buildMockSpace(xml) {
+        Resource thisResource
         xml.rootspace (name: "$mutName - Mocks", uri: "$mutUri:mocks") {
+            tests.each {
+                it.mocks.each {
+                    thisResource = it
+                    endpoint {
+                        grammar {
+                            if (thisResource.uri) {
+                                simple(thisResource.uri)
+                            }
+                            else {
+                                active {
+                                    identifier(thisResource.identifier)
+                                    thisResource.getArguments().each {
+                                        argument(name: it.name, min: it.min, max: it.max)
+                                    }
+                                    if (thisResource.varArgs) {
+                                        varargs()
+                                    }
+                                }
+                            }
+                        }
+                        buildRequest(xml, thisResource.request)
+                    }
+                }
+            }
 
+        }
+    }
+
+    private def buildRequest(xml, Request thisRequest) {
+        if(thisRequest) {
+
+            xml.request {
+                identifier(thisRequest.identifier)
+                thisRequest.arguments.each {
+                    switch (it.passBy) {
+                        case 'value':
+                            argument(name: it.name, method: "as-string", it.value)
+                            break
+                        default:
+                            argument(name: it.name, it.value)
+                            break
+                    }
+                }
+            }
         }
     }
 

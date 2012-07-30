@@ -1,5 +1,4 @@
-tests() {
-    for_module 'urn:flunk:sample:module:impl'
+tests(mutName: 'Flunk Sample Module', version: '1.0.0', mutUri: 'urn:flunk:sample:module:impl') {
 
     test (name: 'verify Google call') {
         make_request_to ('active:callGoogle') {
@@ -14,7 +13,11 @@ tests() {
 
         mock_resource ('active:httpGet') {
             with_argument (name:'url')
-            respond_with 'this is an httpGet mock'
+            respond_with {
+                resource ('active:groovy') {
+
+                }
+            }
         }
     }
 }

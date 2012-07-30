@@ -164,18 +164,51 @@ class EndpointTest extends GroovyTestCase {
 
         assertTrue("Endpoint doesn't contain request to resource $anotherResource",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>/ + anotherResource).find())
+                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>/ + anotherResource).find())
 
         assertTrue("Request doesn't contain argument $argName",
                 (xml.replace('\n', ' ') =~
-                /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='/ + argName + /'>/).find())
+                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='/ + argName + /'>/).find())
 
         assertTrue("Argument $argName doesn't contain value $argValue",
                 (xml.replace('\n', ' ') =~
-                /<request>.*<argument.*>/ + argValue).find())
+                        /<request>.*<argument.*>/ + argValue).find())
 
 
     }
+
+//    void testCreateRequestToGroovyScript() {
+//        def myResource = 'active:myResource'
+//        def anotherResource = 'active:anotherResource'
+//        def myScript = 'res:/resources/scripts/myGroovy.groovy'
+//
+//        Module mut = builder.module () {
+//            expose {
+//                resource (myResource) {
+//                    make_request_to {
+//                        use_script myScript
+//                    }
+//                }
+//            }
+//        }
+//
+//        String xml = mut.buildModuleXml()
+//
+//        assertTrue("Endpoint doesn't contain request to resource $anotherResource",
+//                (xml.replace('\n', ' ') =~
+//                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<identifier>/ + anotherResource).find())
+//
+//        assertTrue("Request doesn't contain argument $argName",
+//                (xml.replace('\n', ' ') =~
+//                        /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='/ + argName + /'>/).find())
+//
+//        assertTrue("Argument $argName doesn't contain value $argValue",
+//                (xml.replace('\n', ' ') =~
+//                        /<request>.*<argument.*>/ + argValue).find())
+//
+//
+//    }
+
 
     void testUseResourceKeywordToSpecifySimpleGrammar()  {
         def arg1 = 'arg1'

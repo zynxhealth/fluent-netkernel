@@ -32,8 +32,13 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                     case Exposure:
                         parent.resource = child
                         break
+
                     case Sequence:
                         parent.requests << child
+                        break
+
+                    case Test:
+                        parent.mocks << child
                         break
                 }
                 break
@@ -50,7 +55,18 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                     case Resource:
                         parent.request = child
                         break
+                    case Test:
+                        parent.request = child
+                        break
                 }
+                break
+
+            case Test:
+                parent.tests << child
+                break
+
+            case Assert:
+                parent.asserts << child
                 break
         }
     }
@@ -85,7 +101,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 result = Manipulator.does { it.rewriteUri = body }
                 break
 
-            case 'resource':
+            case ['resource', 'mock_resource', 'make_request_to']:
                 result = instantiate(name)
                 result.identifier = body
                 break
@@ -99,18 +115,25 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 result = Manipulator.does { it.varArgs = true }
                 break
 
-            case 'make_request_to':
-                result = instantiate(name)
-                result.identifier = body
-                break
-
             case 'defined_in':
                 result = Manipulator.does { it.imports << new Import(uri: body) }
                 break
 
-            case 'step':
-                result = instantiate(name)
-                result.initializeResource(body)
+//            case 'step':
+//                result = instantiate(name)
+//                result.initializeResource(body)
+//                break
+
+            case 'stringEquals':
+                result = Manipulator.does { it.stringEquals = body }
+                break
+
+            case 'minTime':
+                result = Manipulator.does { it.minTime = body }
+                break
+
+            case 'maxTime':
+                result = Manipulator.does { it.maxTime = body }
                 break
 
             default:
@@ -141,10 +164,6 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 return new Module()
                 break
 
-            case 'map':
-                return new Exposure()
-                break
-
             case 'expose':
                 return new Exposure()
                 break
@@ -153,16 +172,12 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 return new Argument()
                 break
 
-            case 'resource':
+            case ['resource', 'mock_resource']:
                 return new Resource()
                 break
 
             case 'use_sequence':
                 return new Sequence()
-                break
-
-            case 'step':
-                return new Resource()
                 break
 
             case 'make_request_to':
@@ -171,6 +186,14 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
             case 'tests':
                 return new TestList()
+                break
+
+            case 'test':
+                return new Test()
+                break
+
+            case 'assert_response':
+                return new Assert()
                 break
         }
     }
