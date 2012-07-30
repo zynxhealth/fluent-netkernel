@@ -4,7 +4,7 @@ import zynx.flunk.Argument
 import zynx.flunk.Resource
 
 class EndpointTest extends GroovyTestCase {
-    private NetKernelBuilder builder;
+    private NetKernelBuilder builder
 
     protected void setUp() {
         builder = new NetKernelBuilder()
@@ -486,8 +486,7 @@ class EndpointTest extends GroovyTestCase {
                 /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:groovy/).find())
     }
 
-
-    void testSetupImplSpace() {
+     void testSetupImplSpace() {
         def moduleName = 'Math Functions'
         def moduleUri = 'urn:my:math:functions'
         def myResource = 'active:myResource'
@@ -507,8 +506,6 @@ class EndpointTest extends GroovyTestCase {
         }
 
         String xml = mut.buildModuleXml()
-
-        println xml
 
         assertTrue("Module doesn't contain implementation space '$moduleName - Impl'",
                 (xml.replace('\n', ' ') =~
@@ -533,26 +530,6 @@ class EndpointTest extends GroovyTestCase {
         assertTrue("Import for $resourceSpace not found in execution space",
                 (xml.replace('\n', ' ') =~
                 /<rootspace name='/ + moduleName + /'.*<import.*>.*<uri>/ + resourceSpace).find())
-    }
-
-    void testCreateSampleModule() {
-        Module module =
-            builder.module (uri: 'urn:alex:test:module', name: 'my test module', version: '1.0.0', ) {
-                expose_to 'http'
-                expose {
-                    file_path 'res:/get-doc-file/(.*)'
-                    via_rewrite 'res:/resources/doc/$1'
-                }
-                expose {
-                    resource ('res:/test/hello/{user}')
-                    use_script 'res:/resources/scripts/test.ftl'
-                    with_argument (name: 'user', pass_by: 'value')
-                }
-                expose {
-                    resource ('res:/test/hello2/{user}')
-                    use_script 'res:/resources/scripts/myscript.groovy'
-                }
-            }
     }
 
 //    void testCreateSimpleDPMLSequence() {

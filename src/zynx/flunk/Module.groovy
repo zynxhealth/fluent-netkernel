@@ -18,6 +18,8 @@ class Module {
 
         xml.module(version : '2.0') {
 
+            buildModuleMeta(xml)
+
             if (setupImplSpace) {
                 // execution space
                 rootspace (name: this.name, uri: this.uri) {
@@ -37,7 +39,6 @@ class Module {
                 }
             }
             else {
-                buildModuleMeta(xml)
                 rootspace {
                     buildFrontEndFulcrumHook(xml)
                     buildSimpleExposures(xml)

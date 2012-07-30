@@ -1,4 +1,4 @@
-module (uri: 'urn:flunk:testmodule', name: 'my test module', version: '1.0.0') {
+module (uri: 'urn:flunk:sample:module', name: 'Flunk sample module', version: '1.0.0') {
 
     // hook rootspace into front-end fulcrum
     expose_to 'http'

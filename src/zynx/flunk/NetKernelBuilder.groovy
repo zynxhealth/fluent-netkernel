@@ -4,8 +4,6 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
     @Override
     protected void setParent(Object parent, Object child) {
-//        Console.println 'Associating parent ' + parent + ' with child ' + child
-
         switch (child.class) {
             case Manipulator:
                 child.apply(parent)
@@ -169,6 +167,10 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
 
             case 'make_request_to':
                 return new Request()
+                break
+
+            case 'tests':
+                return new TestList()
                 break
         }
     }
