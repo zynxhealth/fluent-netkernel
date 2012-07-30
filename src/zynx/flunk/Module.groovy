@@ -25,16 +25,21 @@ class Module {
                 rootspace (name: this.name, uri: this.uri) {
                     buildFrontEndFulcrumHook(xml)
                     buildDependencies(xml)
+                    xml.'import' {
+                        'uri' this.uri + ':impl'
+                    }
                 }
 
                 // implementation space
                 rootspace (name: this.name + ' - Impl', uri: this.uri + ':impl') {
                     buildSimpleExposures(xml)
-                    mapper {
-                        config {
-                            buildEndpoints(xml)
+                    if (this.exposures.any {it.resource}) {
+                        mapper {
+                            config {
+                                buildEndpoints(xml)
+                            }
+                            space {}
                         }
-                        space {}
                     }
                 }
             }

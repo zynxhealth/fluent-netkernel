@@ -4,12 +4,12 @@ SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 show_usage() {
 echo ${0##/*}" Usage:"
 echo "  Generate and Commission a Netkernel Module using the flunk DSL "
-echo "${0##/} -s MODULE_SOURCE_DIRECTORY [-f MODULE_FOLDERS_DIRECTORY] [-m MODULES_DIRECTORY]"
-echo "[-n NETKERNEL_ROOT_DIRECTORY] [-t (xml/groovy)]"
+echo "${0##/} (-s MODULE_SOURCE_DIRECTORY -t (xml/groovy)) | -S SCRIPT_FILE_PATH]"
+echo "  [-m MODULES_DIRECTORY] [-f MODULE_FOLDERS_DIRECTORY] [-n NETKERNEL_ROOT_DIRECTORY]"
 exit
 }
 
-MINARGS=1
+MINARGS=4
 
 case $1 in
 	""|"-h"|"--help") show_usage ;;
@@ -28,10 +28,11 @@ MODULE_FILE=""
 MODULE_FOLDERS_DIRECTORY=""
 NETKERNEL_ROOT_DIRECTORY=""
 MODULE_TYPE=""
+SCRIPT_FILE_PATH=""
 FLUNK_PATH=$SCRIPT_HOME
 MODULES_DIR=$SCRIPT_HOME
 
-while getopts s:f:m:n:t: opt 
+while getopts s:S:f:m:n:t: opt
 do 
 	case "$opt" in
 		s) MODULE_SOURCE_DIRECTORY=$OPTARG;;
@@ -39,6 +40,7 @@ do
 		m) MODULES_DIR=$OPTARG;;
 		n) NETKERNEL_ROOT_DIRECTORY=$OPTARG;;
 		t) MODULE_TYPE=$OPTARG;;
+		S) SCRIPT_FILE_PATH=$OPTARG;;
 		[?]) show_usage;;
 	esac
 done
@@ -47,7 +49,12 @@ echo "Generating module XML"
 
 MODULE_TYPE=$(echo $MODULE_TYPE | tr -d ' ')
 
-MODULE_FILE=$(echo $MODULE_SOURCE_DIRECTORY/module.$MODULE_TYPE | tr -d ' ')
+if [ $SCRIPT_FILE_PATH = "" ]; then
+    MODULE_FILE=$(echo $MODULE_SOURCE_DIRECTORY/module.$MODULE_TYPE | tr -d ' ')
+else
+    MODULE_FILE=$(echo $SCRIPT_FILE_PATH | tr -d ' ')
+    MODULE_TYPE=${MODULE_FILE##*.}
+fi
 
 
 if [[ ! -e $MODULE_FILE ]]; then
