@@ -101,7 +101,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 result = Manipulator.does { it.rewriteUri = body }
                 break
 
-            case ['resource', 'mock_resource', 'make_request_to']:
+            case ['resource', 'mock_resource', 'make_request_to', 'respond_with']:
                 result = instantiate(name)
                 result.identifier = body
                 break
@@ -180,7 +180,7 @@ public class NetKernelBuilder extends groovy.util.BuilderSupport {
                 return new Sequence()
                 break
 
-            case 'make_request_to':
+            case ['make_request_to', 'respond_with']:
                 return new Request()
                 break
 

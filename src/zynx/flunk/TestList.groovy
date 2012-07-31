@@ -56,7 +56,6 @@ class TestList {
         writer.toString()
     }
 
-
     private def buildAsserts(xml, test) {
         Assert thisAssert
 
@@ -78,7 +77,7 @@ class TestList {
     }
 
     private def buildTestSpace(xml)  {
-        xml.rootspace (name: "$mutName - Tests", uri: "$mutUri:test") {
+        xml.rootspace (name: "$mutName - Tests", uri: "$mutUri:tests") {
 
             fileset {
                 regex('res:/etc/system/Tests.xml')
@@ -109,36 +108,78 @@ class TestList {
         }
     }
 
-    private def buildMockSpace(xml) {
+    private def buildEndpoints(xml) {
         Resource thisResource
-        xml.rootspace (name: "$mutName - Mocks", uri: "$mutUri:mocks") {
-            tests.each {
-                it.mocks.each {
-                    thisResource = it
-                    endpoint {
-                        grammar {
-                            if (thisResource.uri) {
-                                simple(thisResource.uri)
-                            }
-                            else {
-                                active {
-                                    identifier(thisResource.identifier)
-                                    thisResource.getArguments().each {
-                                        argument(name: it.name, min: it.min, max: it.max)
-                                    }
-                                    if (thisResource.varArgs) {
-                                        varargs()
-                                    }
+
+        tests.each {
+            it.mocks.each {
+                thisResource = it
+                xml.endpoint {
+                    grammar {
+                        if (thisResource.uri) {
+                            simple(thisResource.uri)
+                        }
+                        else {
+                            active {
+                                identifier(thisResource.identifier)
+                                thisResource.getArguments().each {
+                                    argument(name: it.name, min: it.min, max: it.max)
+                                }
+                                if (thisResource.varArgs) {
+                                    varargs()
                                 }
                             }
                         }
-                        buildRequest(xml, thisResource.request)
+                    }
+                    buildRequest(xml, thisResource.request)
+                }
+            }
+        }
+    }
+
+    private def buildMockSpace(xml) {
+        xml.rootspace (name: "$mutName - Mocks", uri: "$mutUri:mocks") {
+            if (tests.any { it.mocks } ) {
+                mapper {
+                    config {
+                        buildEndpoints(xml)
+                    }
+                    space {
+                        buildDependencies(xml)
                     }
                 }
             }
-
         }
     }
+
+private def buildDependencies(xml) {
+    Resource thisResource, innerResource
+    Request thisRequest
+    Import thisImport
+
+    tests.each {
+        it.mocks.each {
+            thisResource = it
+            thisRequest = thisResource.request
+
+            if (thisRequest) {
+                thisRequest.imports.each {
+                    thisImport = it
+                    xml.'import' {
+                        'uri' (thisImport.uri)
+                    }
+                }
+
+                if (thisRequest.resourcePath) {
+                    xml.fileset {
+                        regex (thisRequest.resourcePath)
+                    }
+                }
+            }
+        }
+    }
+}
+
 
     private def buildRequest(xml, Request thisRequest) {
         if(thisRequest) {
@@ -162,7 +203,7 @@ class TestList {
     private def buildModuleMeta(xml) {
         xml.meta {
             identity(null) {
-                uri this.mutUri + ':test'
+                uri this.mutUri + ':tests'
                 version this.version
             }
             info {

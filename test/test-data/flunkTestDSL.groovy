@@ -13,10 +13,10 @@ tests(mutName: 'Flunk Sample Module', version: '1.0.0', mutUri: 'urn:flunk:sampl
 
         mock_resource ('active:httpGet') {
             with_argument (name:'url')
-            respond_with {
-                resource ('active:groovy') {
 
-                }
+            respond_with ('active:groovy') {
+                with_argument (name: 'operator', value: "context.createResponseFrom('this is an httpGet mock')")
+                defined_in ('urn:org:netkernel:lang:groovy')
             }
         }
     }

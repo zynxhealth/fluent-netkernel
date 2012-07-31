@@ -227,37 +227,41 @@ class XUnitTest extends GroovyTestCase {
 
     }
 
-//    void testCreateTestWithMockAndResponse() {
-//        def testName = 'my test'
-//        def mockedResource = 'mymock'
-//        def argName = 'argName'
-//
-//        TestList xut = builder.tests() {
-//            test (name: testName) {
-//                mock_resource (mockedResource) {
-//                    with_argument (name: argName)
-//
-//                    respond_with {
-//                        resource ('res:/test/hello/{name}')
-//                        use_script 'res:/resources/scripts/sayHello.ftl' {
-//                            with_argument (name: 'name', value: '[[arg:name]]', pass_by: 'value')
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        String xml = xut.buildModuleXml()
-//        println xml
-//
-//        assertTrue("Endpoint for '$mockedResource' doesn't exist",
-//                (xml.replace('\n', ' ') =~
-//                        /<endpoint.*>.*<grammar>.*<active>.*<identifier>/ + mockedResource).find())
-//
-//        assertTrue("Endpoint '$mockedResource' is missing argument '$argName'",
-//                (xml.replace('\n', ' ') =~
-//                        /<endpoint.*>.*<grammar>.*<active>.*<argument name='/ + argName + /'/).find())
-//
-//    }
+    void testCreateTestWithMockAndResponse() {
+        def testName = 'my test'
+        def mockedResource = 'mymock'
+        def argName = 'argName'
+        def innerResource = 'active:groovy'
+        def innerArgName = 'operator'
+        def innerArgValue = "context.createResponseFrom"
+        def innerSpace =  'urn:org:netkernel:lang:groovy'
+
+        TestList xut = builder.tests() {
+            test (name: testName) {
+                mock_resource (mockedResource) {
+                    with_argument (name: argName)
+
+                    respond_with (innerResource) {
+                        with_argument (name: innerArgName, value: innerArgValue)
+                        defined_in innerSpace
+                    }
+                }
+            }
+        }
+
+        String xml = xut.buildModuleXml()
+
+        assertTrue("Endpoint for '$mockedResource' doesn't exist",
+                (xml.replace('\n', ' ') =~
+                /<endpoint.*>.*<grammar>.*<active>.*<identifier>/ + mockedResource).find())
+
+        assertTrue("Endpoint '$mockedResource' is missing a request to $innerResource",
+                (xml.replace('\n', ' ') =~
+                /<rootspace.*mocks.*<request>.*<identifier>/ + innerResource).find())
+
+        assertTrue("Rootspace is missing an import of $innerSpace",
+                (xml.replace('\n', ' ') =~
+                /<import>.*<uri>/ + innerSpace).find())
+    }
 
 }
