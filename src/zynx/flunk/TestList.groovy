@@ -3,6 +3,8 @@ package zynx.flunk
 import groovy.xml.MarkupBuilder
 
 class TestList {
+    final static String DefaultTestListFileUri = "res:/resources/test/testlist.xml"
+
     String mutName
     String version
     String mutUri
@@ -14,13 +16,31 @@ class TestList {
         def writer = new StringWriter()
         def xml = new MarkupBuilder(writer)
 
-        xml.module(version : '2.0') {
+        xml.module(version: '2.0') {
             buildModuleMeta(xml)
             buildTestSpace(xml)
             buildMockSpace(xml)
         }
 
         writer.toString()
+    }
+
+    String buildTestReferencesXml() {
+        StringWriter writer = new StringWriter()
+        MarkupBuilder builder = new MarkupBuilder(writer)
+
+        // tests(mutName: 'Flunk Sample Module', version: '1.0.0', mutUri: 'urn:flunk:sample:module:impl') {
+
+        builder.tests {
+            test {
+                id("$mutUri:test")
+                name("$mutName tests")
+                desc("$mutName tests")
+                uri(DefaultTestListFileUri)
+            }
+        }
+
+        return writer.toString()
     }
 
     public String buildTestListXml() {
@@ -32,10 +52,10 @@ class TestList {
         xml.testlist {
             tests.each {
                 thisTest = it
-                test (name: thisTest.name) {
+                test(name: thisTest.name) {
                     if (thisTest.request) {
                         request {
-                            identifier (thisTest.request.identifier)
+                            identifier(thisTest.request.identifier)
                             thisTest.request.arguments.each {
                                 switch (it.passBy) {
                                     case 'value':
@@ -63,21 +83,21 @@ class TestList {
             thisAssert = it
             xml.'assert' {
                 if (thisAssert.stringEquals) {
-                    stringEquals (thisAssert.stringEquals)
+                    stringEquals(thisAssert.stringEquals)
                 }
                 if (thisAssert.minTime) {
-                    minTime (thisAssert.minTime)
+                    minTime(thisAssert.minTime)
                 }
                 if (thisAssert.maxTime) {
-                    maxTime (thisAssert.maxTime)
+                    maxTime(thisAssert.maxTime)
                 }
             }
         }
 
     }
 
-    private def buildTestSpace(xml)  {
-        xml.rootspace (name: "$mutName - Tests", uri: "$mutUri:tests") {
+    private def buildTestSpace(xml) {
+        xml.rootspace(name: "$mutName - Tests", uri: "$mutUri:tests") {
 
             fileset {
                 regex('res:/etc/system/Tests.xml')
@@ -86,24 +106,24 @@ class TestList {
                 regex('res:/resources/test/.*')
             }
             endpoint {
-                prototype ('Limiter') {
-                    grammar ('res:/etc/') {
-                        regex (type: "anything")
+                prototype('Limiter') {
+                    grammar('res:/etc/') {
+                        regex(type: "anything")
                     }
                 }
             }
 
             'import' {
-                'uri' ("$mutUri:mocks")
+                'uri'("$mutUri:mocks")
             }
 
             'import' {
-                'uri' (mutUri)
+                'uri'(mutUri)
             }
 
             'import' {
-                'uri' ('urn:org:netkernel:ext:layer1')
-                'private' ()
+                'uri'('urn:org:netkernel:ext:layer1')
+                'private'()
             }
         }
     }
@@ -138,8 +158,8 @@ class TestList {
     }
 
     private def buildMockSpace(xml) {
-        xml.rootspace (name: "$mutName - Mocks", uri: "$mutUri:mocks") {
-            if (tests.any { it.mocks } ) {
+        xml.rootspace(name: "$mutName - Mocks", uri: "$mutUri:mocks") {
+            if (tests.any { it.mocks }) {
                 mapper {
                     config {
                         buildEndpoints(xml)
@@ -152,37 +172,37 @@ class TestList {
         }
     }
 
-private def buildDependencies(xml) {
-    Resource thisResource, innerResource
-    Request thisRequest
-    Import thisImport
+    private def buildDependencies(xml) {
+        Resource thisResource, innerResource
+        Request thisRequest
+        Import thisImport
 
-    tests.each {
-        it.mocks.each {
-            thisResource = it
-            thisRequest = thisResource.request
+        tests.each {
+            it.mocks.each {
+                thisResource = it
+                thisRequest = thisResource.request
 
-            if (thisRequest) {
-                thisRequest.imports.each {
-                    thisImport = it
-                    xml.'import' {
-                        'uri' (thisImport.uri)
+                if (thisRequest) {
+                    thisRequest.imports.each {
+                        thisImport = it
+                        xml.'import' {
+                            'uri'(thisImport.uri)
+                        }
                     }
-                }
 
-                if (thisRequest.resourcePath) {
-                    xml.fileset {
-                        regex (thisRequest.resourcePath)
+                    if (thisRequest.resourcePath) {
+                        xml.fileset {
+                            regex(thisRequest.resourcePath)
+                        }
                     }
                 }
             }
         }
     }
-}
 
 
     private def buildRequest(xml, Request thisRequest) {
-        if(thisRequest) {
+        if (thisRequest) {
 
             xml.request {
                 identifier(thisRequest.identifier)
@@ -234,5 +254,6 @@ private def buildDependencies(xml) {
             }
         }
     }
+
 }
 

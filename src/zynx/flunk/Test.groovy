@@ -6,8 +6,8 @@ class Test {
     List<Resource> mocks = []
     List<Assert> asserts = []
 
-    public void setAttributes(Map attrs) {
-        attrs.each { key, value ->
+    public void setAttributes(Map attributes) {
+        attributes.each { key, value ->
             switch (key) {
                 case 'name':
                     name = value

@@ -6,6 +6,7 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
+  <component name="IdProvider" IDEtalkID="581C52D37364686114264D3ED07947DB" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
@@ -140,5 +141,6 @@
       <Port>5050</Port>
     </configuration>
   </component>
+  <component name="WebServicesPlugin" addRequiredLibraries="true" />
 </project>
 

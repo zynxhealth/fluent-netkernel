@@ -1,22 +1,25 @@
 package zynx.flunk
 
-enum WhatToMake {MODULE, TESTLIST}
-
 class Generate {
-
     public static void main(String[] args) {
-        WhatToMake what = WhatToMake.MODULE
+        WhatToMake what = WhatToMake.Module
 
-        if(args.length < 1)
-        {
+        if (args.length < 1) {
             System.out.print 'Error: missing module file to be generated\n'
             return
         }
 
         if (args.length > 1) {
             switch (args[1]) {
-                case 'module': what = WhatToMake.MODULE; break
-                case 'testlist': what = WhatToMake.TESTLIST; break
+                case 'module':
+                    what = WhatToMake.Module;
+                    break
+                case 'testlist':
+                    what = WhatToMake.TestList;
+                    break
+                case 'testreferences':
+                    what = WhatToMake.TestReferences;
+                    break;
             }
         }
 
@@ -31,14 +34,21 @@ class Generate {
         module = module + 'return config'
 
         GroovyShell shell = new GroovyShell()
-        def results = shell.evaluate(module)
+        TestList results = shell.evaluate(module)
 
         String response
         switch (what) {
-            case WhatToMake.MODULE: response = results.buildModuleXml(); break
-            case WhatToMake.TESTLIST: response = results.buildTestListXml(); break
+            case WhatToMake.Module:
+                response = results.buildModuleXml();
+                break
+            case WhatToMake.TestList:
+                response = results.buildTestListXml();
+                break
+            case WhatToMake.TestReferences:
+                response = results.buildTestReferencesXml();
+                break
         }
 
-        System.out.print response
+        println response
     }
 }
