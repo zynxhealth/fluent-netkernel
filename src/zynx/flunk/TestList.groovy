@@ -106,10 +106,9 @@ class TestList {
                 regex('res:/resources/test/.*')
             }
             endpoint {
-                prototype('Limiter') {
-                    grammar('res:/etc/') {
-                        regex(type: "anything")
-                    }
+                prototype('Limiter')
+                grammar('res:/etc/') {
+                    regex(type: "anything")
                 }
             }
 

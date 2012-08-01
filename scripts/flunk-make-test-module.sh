@@ -45,7 +45,7 @@ mkdir -p "$MODULE_DIRECTORY_PATH/resources/test"
 
 MODULE_FLUNK_TEMPLATE="tests.flunk.template"
 
-cat "$SCRIPT_HOME/$MODULE_FLUNK_TEMPLATE" | \
+cat "$SCRIPT_HOME/templates/$MODULE_FLUNK_TEMPLATE" | \
 sed -e "s/{{MUT_NAME}}/$MUT_NAME/g" \
     -e "s/{{MUT_NAMESPACE_URI}}/$MUT_NAMESPACE_URI/g" \
     -e "s/{{MODULE_VERSION}}/$MODULE_VERSION/g" > "$MODULE_DIRECTORY_PATH/tests.flunk" 

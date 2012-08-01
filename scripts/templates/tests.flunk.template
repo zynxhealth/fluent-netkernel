@@ -1,0 +1,11 @@
+tests(mutName: '{{MUT_NAME}}', version: '{{MODULE_VERSION}}', mutUri: '{{MUT_NAMESPACE_URI}}') {
+	test (name: 'Sample test') {
+		     make_request_to ('active:toUpper') {
+		     	with_argument(name:'operand', value:'xyz')
+		     }
+
+        assert_response {
+            stringEquals 'XYZ'
+        }
+    }
+}

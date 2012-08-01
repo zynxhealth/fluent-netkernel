@@ -51,7 +51,7 @@ if [[ $EXPOSE_TO_HTTP = true ]]; then
 	MODULE_FLUNK_TEMPLATE="module.flunk.template.exposetohttp"
 fi
 
-cat "$SCRIPT_HOME/$MODULE_FLUNK_TEMPLATE" | \
+cat "$SCRIPT_HOME/templates/$MODULE_FLUNK_TEMPLATE" | \
 sed -e "s/{{MODULE_NAME}}/$MODULE_NAME/g" \
     -e "s/{{MODULE_NAMESPACE_URI}}/$MODULE_NAMESPACE_URI/g" \
     -e "s/{{MODULE_VERSION}}/$MODULE_VERSION/g" > "$MODULE_DIRECTORY_PATH/module.flunk" 
