@@ -58,7 +58,7 @@ class TestList {
                             identifier(thisTest.request.identifier)
                             thisTest.request.arguments.each {
                                 switch (it.passBy) {
-                                    case 'value':
+                                    case 'argument-as-string':
                                         argument(name: it.name, method: "as-string", it.value)
                                         break
                                     default:
@@ -186,13 +186,13 @@ class TestList {
                     thisRequest.imports.each {
                         thisImport = it
                         xml.'import' {
-                            'uri'(thisImport.uri)
+                        'uri' (thisImport.uri)
                         }
                     }
 
                     if (thisRequest.resourcePath) {
                         xml.fileset {
-                            regex(thisRequest.resourcePath)
+                        regex (thisRequest.resourcePath)
                         }
                     }
                 }
@@ -208,7 +208,7 @@ class TestList {
                 identifier(thisRequest.identifier)
                 thisRequest.arguments.each {
                     switch (it.passBy) {
-                        case 'value':
+                        case 'argument-as-string':
                             argument(name: it.name, method: "as-string", it.value)
                             break
                         default:
@@ -223,7 +223,7 @@ class TestList {
     private def buildModuleMeta(xml) {
         xml.meta {
             identity(null) {
-                uri this.mutUri + ':tests'
+                uri this.mutUri.replaceAll(/:impl$/, '') + ':tests'
                 version this.version
             }
             info {

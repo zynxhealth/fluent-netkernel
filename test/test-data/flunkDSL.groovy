@@ -22,7 +22,7 @@ module(uri: 'urn:flunk:sample:module', name: 'Flunk sample module', version: '1.
     expose {
         resource('res:/test/hello/{name}')
         use_script('res:/resources/scripts/sayHello.ftl') {
-            with_argument(name: 'name', value: '[[arg:name]]', pass_by: 'value')
+            with_argument (name: 'name', value: '[[arg:name]]', pass_by: 'argument-as-string')
         }
     }
     /* code above results in

@@ -129,18 +129,29 @@ class Module {
     }
 
     private def buildRequest(xml, Request thisRequest) {
+        Argument thisArg
         if(thisRequest) {
 
             xml.request {
                 identifier(thisRequest.identifier)
                 thisRequest.arguments.each {
-                    switch (it.passBy) {
-                        case 'value':
+                    thisArg = it
+
+                    switch (thisArg.passBy) {
+                        case 'literal-xml':
+                            argument(name: thisArg.name) {
+                                literal(type: 'xml') {
+                                    thisArg.value.call(xml)
+                                }
+                            }
+                            break
+
+                        case 'argument-as-string':
                             argument(name: it.name, method: "as-string", it.value)
                             break
+
                         default:
                             argument(name: it.name, it.value)
-                            break
                     }
                 }
             }

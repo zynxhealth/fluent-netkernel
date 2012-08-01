@@ -2,6 +2,7 @@ import zynx.flunk.Module
 import zynx.flunk.NetKernelBuilder
 import zynx.flunk.Argument
 import zynx.flunk.Resource
+import groovy.xml.MarkupBuilder
 
 class EndpointTest extends GroovyTestCase {
     private NetKernelBuilder builder
@@ -354,7 +355,7 @@ class EndpointTest extends GroovyTestCase {
             expose {
                 resource (uri)
                 use_script (scriptPath) {
-                    with_argument (name: arg1, pass_by: 'value', value: "[[arg:$arg1]]")
+                    with_argument (name: arg1, pass_by: 'argument-as-string', value: "[[arg:$arg1]]")
                     with_argument (name: arg2, value: "[[arg:$arg2]]")
                     with_varargs true
                 }
@@ -519,7 +520,7 @@ class EndpointTest extends GroovyTestCase {
                 /<mapper.*>.*<space.*>.*<import.*>.*<uri>urn:org:netkernel:lang:groovy/).find())
     }
 
-     void testSetupImplSpace() {
+    void testSetupImplSpace() {
         def moduleName = 'Math Functions'
         def moduleUri = 'urn:my:math:functions'
         def myResource = 'active:myResource'
@@ -564,6 +565,37 @@ class EndpointTest extends GroovyTestCase {
                 (xml.replace('\n', ' ') =~
                 /<rootspace name='/ + moduleName + /'.*<import.*>.*<uri>/ + resourceSpace).find())
     }
+
+    void testXmlCanBePassedAsLiteral() {
+        def arg = 'baz'
+        def uri = "res:/foobar"
+        def scriptPath = 'res:/resources/foobar.groovy'
+        def xmlBuilding =
+            { it.foo
+                    { bar() }
+            }
+
+        Module mut = builder.module () {
+            expose {
+                resource (uri)
+                use_script (scriptPath) {
+                    with_argument (name: arg, pass_by: 'literal-xml', value: xmlBuilding)
+                }
+            }
+        }
+
+        String xml = mut.buildModuleXml().replace('\n', ' ')
+
+        assertTrue("Argument {$arg} doesn't contain 'literal' element",
+        (xml =~ /<mapper.*>.*<config.*>.*<endpoint.*>.*<request>.*<argument name='/+ arg + /'.*>.*<literal/).find())
+
+        assertTrue("Argument {$arg} literal value doesn't specify 'xml' type",
+        (xml =~ /<argument name='/+ arg + /'.*>.*<literal type='xml'>/).find())
+
+        assertTrue("Argument {$arg} literal value doesn't contain the expected XML contents",
+        (xml =~ /<foo> *<bar *\/> *<\/foo>/).find())
+    }
+
 
 //    void testCreateSimpleDPMLSequence() {
 //        def resourceName = 'res:/run-dpml/'
@@ -626,9 +658,5 @@ class EndpointTest extends GroovyTestCase {
 //                (xml.replace('\n', ' ') =~
 //                /<mapper.*>.*<space.*>.*<fileset.*>.*<regex>/ + scriptPath).find())
 //    }
-
-
-
-
 
 }

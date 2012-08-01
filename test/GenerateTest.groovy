@@ -32,7 +32,7 @@ class GenerateTest extends GroovyTestCase {
             expose {
                 resource('res:/test/hello/{user}')
                 use_script 'res:/resources/scripts/test.ftl'
-                with_argument(name: 'user', pass_by: 'value')
+                with_argument (name: 'user', pass_by: 'argument-as-string')
             }
             expose {
                 resource('res:/test/hello2/{user}')

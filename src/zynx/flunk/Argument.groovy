@@ -2,7 +2,7 @@ package zynx.flunk
 
 class Argument {
     String name
-    String value
+    Object value
     String passBy
     String min = 1
     String max = 1

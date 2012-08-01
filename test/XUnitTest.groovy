@@ -11,9 +11,10 @@ class XUnitTest extends GroovyTestCase {
     void testCreateXUnitModule() {
         def mutName = 'My Module'
         def moduleVersion = '1.0.0'
-        def mutUri = 'urn:my:module:impl'
+        def mutImplUri = 'urn:my:module:impl'
+        def mutUri = 'urn:my:module'
 
-        TestList xut = builder.tests(mutName: mutName, version: moduleVersion, mutUri: mutUri) {}
+        TestList xut = builder.tests(mutName: mutName, version: moduleVersion, mutUri: mutImplUri) {}
 
         String xml = xut.buildModuleXml()
 
@@ -203,11 +204,14 @@ class XUnitTest extends GroovyTestCase {
     }
 
     void testCreateTestWithMock() {
+        def mutName = 'My Module'
+        def moduleVersion = '1.0.0'
+        def mutUri = 'urn:my:module:impl'
         def testName = 'my test'
         def mockedResource = 'mymock'
         def argName = 'argName'
 
-        TestList xut = builder.tests() {
+        TestList xut = builder.tests(mutName: mutName, version: moduleVersion, mutUri: mutUri) {
             test (name: testName) {
                 mock_resource (mockedResource) {
                     with_argument (name: argName)
@@ -228,6 +232,9 @@ class XUnitTest extends GroovyTestCase {
     }
 
     void testCreateTestWithMockAndResponse() {
+        def mutName = 'My Module'
+        def moduleVersion = '1.0.0'
+        def mutUri = 'urn:my:module:impl'
         def testName = 'my test'
         def mockedResource = 'mymock'
         def argName = 'argName'
@@ -236,7 +243,7 @@ class XUnitTest extends GroovyTestCase {
         def innerArgValue = "context.createResponseFrom"
         def innerSpace =  'urn:org:netkernel:lang:groovy'
 
-        TestList xut = builder.tests() {
+        TestList xut = builder.tests(mutName: mutName, version: moduleVersion, mutUri: mutUri) {
             test (name: testName) {
                 mock_resource (mockedResource) {
                     with_argument (name: argName)
@@ -263,5 +270,4 @@ class XUnitTest extends GroovyTestCase {
                 (xml.replace('\n', ' ') =~
                 /<import>.*<uri>/ + innerSpace).find())
     }
-
 }
