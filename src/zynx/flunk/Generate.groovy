@@ -34,7 +34,7 @@ class Generate {
         module = module + 'return config'
 
         GroovyShell shell = new GroovyShell()
-        TestList results = shell.evaluate(module)
+        def results = shell.evaluate(module)
 
         String response
         switch (what) {
