@@ -1,0 +1,3 @@
+tests(mutName: '{{MUT_NAME}}', version: '{{MODULE_VERSION}}', mutUri: '{{MUT_NAMESPACE_URI}}') {
+
+}

@@ -1,6 +1,5 @@
 #!/bin/bash
 SCRIPT_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-FLUNK_PATH=$SCRIPT_HOME
 
 show_usage() {
 	echo ${0##/*}" Usage: flunk-make-module -d MODULE_PARENT_DIRECTORY"
