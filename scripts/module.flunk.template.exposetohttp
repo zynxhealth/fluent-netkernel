@@ -1,0 +1,6 @@
+module(uri: '{{MODULE_NAMESPACE_URI}}', name: '{{MODULE_NAME}}', version: '{{MODULE_VERSION}}') {
+    
+    expose_to 'http'
+    isolate_dependencies true
+
+}

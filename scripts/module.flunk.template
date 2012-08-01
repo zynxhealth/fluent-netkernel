@@ -1,0 +1,5 @@
+module(uri: '{{MODULE_NAMESPACE_URI}}', name: '{{MODULE_NAME}}', version: '{{MODULE_VERSION}}') {
+    
+    isolate_dependencies true
+
+}
